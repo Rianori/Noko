@@ -244,11 +244,11 @@
 
     document.getElementById('confirm-invest').addEventListener('click', () => {
       const finalAmount = parseInt(slider.value);
-      NokoStore.addHolding({
+      window.NokoStore.addHolding({
         projectId: p.id, name: p.name, amount: finalAmount, rate: p.rate, type: p.typeLabel, projectType: p.type, duration: p.duration
       });
       renderSuccessStep(p, finalAmount);
-      renderPortfolio();
+      if(typeof window.NokoRenderHoldings === 'function') window.NokoRenderHoldings();
     });
   }
 
@@ -275,11 +275,11 @@
     `;
 
     document.getElementById('confirm-invest').addEventListener('click', () => {
-      NokoStore.addHolding({
+      window.NokoStore.addHolding({
         projectId: p.id, name: p.name, amount: p.target, rate: p.rate, type: p.typeLabel, projectType: p.type, duration: p.duration
       });
       renderSuccessStep(p, p.target);
-      renderPortfolio();
+      if(typeof window.NokoRenderHoldings === 'function') window.NokoRenderHoldings();
     });
   }
 
@@ -293,7 +293,8 @@
       </div>
     `;
     document.getElementById('close-success').addEventListener('click', () => {
-      window.location.href = 'portefeuille.html';
+      closeModal();
+      document.getElementById('mes-titres').scrollIntoView({ behavior: 'smooth' });
     });
     showToast(`${formatEUR(amount)} investis dans ${p.name}`);
   }
@@ -309,40 +310,6 @@
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape') closeModal();
   });
-
-  function renderPortfolio(){
-    const empty = document.getElementById('portfolio-empty');
-    const summary = document.getElementById('portfolio-summary');
-    const list = document.getElementById('portfolio-list');
-    const portfolio = NokoStore.getHoldings();
-
-    if(portfolio.length === 0){
-      empty.hidden = false;
-      summary.hidden = true;
-      list.innerHTML = '';
-      return;
-    }
-
-    empty.hidden = true;
-    summary.hidden = false;
-
-    const total = portfolio.reduce((sum, item) => sum + item.amount, 0);
-    const yearlyYield = portfolio.reduce((sum, item) => sum + (item.rate ? item.amount * (item.rate/100) : 0), 0);
-
-    document.getElementById('summary-total').textContent = formatEUR(total);
-    document.getElementById('summary-count').textContent = portfolio.length;
-    document.getElementById('summary-yield').textContent = formatEUR(yearlyYield);
-
-    list.innerHTML = portfolio.map(item => `
-      <div class="portfolio-item">
-        <div>
-          <div class="portfolio-item-name">${item.name}</div>
-          <div class="portfolio-item-meta">${item.type}${item.rate ? ' · ' + item.rate + ' %' : ''}${item.status === 'en_vente' ? ' · <span class=\"tag-en-vente\">En vente</span>' : ''}</div>
-        </div>
-        <span class="portfolio-item-amount">${formatEUR(item.amount)}</span>
-      </div>
-    `).reverse().join('');
-  }
 
   function showToast(msg){
     let toast = document.querySelector('.toast');
@@ -367,39 +334,4 @@
   });
 
   renderProjects('tous');
-  renderPortfolio();
-
-  // Panneau de diagnostic discret (voir aussi sur la page Portefeuille pour comparer)
-  const panel = document.createElement('div');
-  panel.className = 'diag-panel';
-  panel.innerHTML = `
-    <button type="button" class="diag-toggle" id="diag-toggle">Diagnostic stockage</button>
-    <pre class="diag-content" id="diag-content" hidden></pre>
-  `;
-  document.body.appendChild(panel);
-
-  document.getElementById('diag-toggle').addEventListener('click', () => {
-    const content = document.getElementById('diag-content');
-    content.hidden = !content.hidden;
-    if(!content.hidden){
-      let raw = null;
-      let storageError = null;
-      try{
-        raw = localStorage.getItem('noko_demo_portfolio_v1');
-      }catch(e){
-        storageError = e.message;
-      }
-      const lines = [
-        'Origine : ' + window.location.origin,
-        'Page : ' + window.location.pathname,
-        'localStorage accessible : ' + (storageError ? 'NON (' + storageError + ')' : 'oui'),
-        'Clé "noko_demo_portfolio_v1" brute :',
-        raw || '(vide ou absente)',
-        '',
-        'NokoStore.getHoldings() :',
-        JSON.stringify(NokoStore.getHoldings(), null, 2)
-      ];
-      content.textContent = lines.join('\n');
-    }
-  });
 })();

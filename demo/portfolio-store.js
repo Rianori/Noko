@@ -1,5 +1,5 @@
 // portfolio-store.js — état partagé du portefeuille NoKo (démo)
-// Persisté en localStorage pour rester cohérent entre demo/index.html et demo/portefeuille.html
+// Persisté en localStorage pour rester cohérent au sein de demo/index.html (page unique).
 // ATTENTION : ceci est une simulation pédagogique, aucune donnée ne sort du navigateur.
 
 window.NokoStore = (function(){

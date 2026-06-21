@@ -48,8 +48,31 @@
   const sellContent = document.getElementById('sell-modal-content');
   const sellClose = document.getElementById('sell-modal-close');
 
+  function groupHoldings(holdings){
+    // Regroupe les titres actifs identiques (même projet, même montant) avec un compteur.
+    // Les titres en vente restent affichés individuellement (chacun peut avoir un prix différent).
+    const groups = [];
+    const onSaleItems = [];
+
+    holdings.forEach(h => {
+      if(h.status === 'en_vente'){
+        onSaleItems.push(h);
+        return;
+      }
+      const key = h.projectId + '|' + h.amount + '|' + h.type;
+      let group = groups.find(g => g.key === key);
+      if(!group){
+        group = { key, ids: [], name: h.name, type: h.type, rate: h.rate, duration: h.duration, amount: h.amount };
+        groups.push(group);
+      }
+      group.ids.push(h.id);
+    });
+
+    return { groups, onSaleItems };
+  }
+
   function renderHoldings(){
-    const holdings = NokoStore.getHoldings();
+    const holdings = window.NokoStore.getHoldings();
 
     if(holdings.length === 0){
       holdingsEmpty.hidden = false;
@@ -68,7 +91,25 @@
     document.getElementById('holdings-count').textContent = holdings.length;
     document.getElementById('holdings-on-sale').textContent = onSale;
 
-    holdingsList.innerHTML = holdings.slice().reverse().map(h => `
+    const { groups, onSaleItems } = groupHoldings(holdings);
+
+    const groupCards = groups.slice().reverse().map(g => {
+      const qtyTag = g.ids.length > 1 ? `<span class="holding-qty-tag">× ${g.ids.length}</span> ` : '';
+      return `
+        <div class="holding-card" data-group-key="${g.key}">
+          <div class="holding-main">
+            <span class="holding-name">${qtyTag}${g.name}</span>
+            <span class="holding-meta">${g.type}${g.rate ? ' · ' + g.rate + ' %' : ''}${g.duration ? ' · ' + g.duration : ''}</span>
+          </div>
+          <div class="holding-right">
+            <span class="holding-amount">${g.ids.length > 1 ? formatEUR(g.amount) + ' / titre' : formatEUR(g.amount)}</span>
+            <button class="btn btn-ghost btn-sm" data-action="sell-group" data-key="${g.key}">Mettre en vente</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const onSaleCards = onSaleItems.slice().reverse().map(h => `
       <div class="holding-card" data-id="${h.id}">
         <div class="holding-main">
           <span class="holding-name">${h.name}</span>
@@ -76,45 +117,58 @@
         </div>
         <div class="holding-right">
           <span class="holding-amount">${formatEUR(h.amount)}</span>
-          ${h.status === 'en_vente'
-            ? `<div class="holding-sale-info">
-                 <span class="tag-en-vente-card">En vente · ${formatEUR(h.askPrice)}</span>
-                 <button class="btn-link-small" data-action="cancel" data-id="${h.id}">Retirer de la vente</button>
-               </div>`
-            : `<button class="btn btn-ghost btn-sm" data-action="sell" data-id="${h.id}">Mettre en vente</button>`
-          }
+          <div class="holding-sale-info">
+            <span class="tag-en-vente-card">En vente · ${formatEUR(h.askPrice)}</span>
+            <button class="btn-link-small" data-action="cancel" data-id="${h.id}">Retirer de la vente</button>
+          </div>
         </div>
       </div>
     `).join('');
 
-    holdingsList.querySelectorAll('[data-action="sell"]').forEach(btn => {
-      btn.addEventListener('click', () => openSellModal(btn.dataset.id));
+    holdingsList.innerHTML = onSaleCards + groupCards;
+
+    holdingsList.querySelectorAll('[data-action="sell-group"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const group = groups.find(g => g.key === btn.dataset.key);
+        if(group) openSellModal(group);
+      });
     });
     holdingsList.querySelectorAll('[data-action="cancel"]').forEach(btn => {
       btn.addEventListener('click', () => {
-        NokoStore.cancelSale(btn.dataset.id);
+        window.NokoStore.cancelSale(btn.dataset.id);
         renderHoldings();
         showToast('Titre retiré de la vente');
       });
     });
   }
 
-  function openSellModal(holdingId){
-    const holding = NokoStore.getHoldings().find(h => h.id === holdingId);
-    if(!holding) return;
-    renderSellStep(holding);
+  window.NokoRenderHoldings = renderHoldings; // appelable depuis demo.js après un investissement initial
+
+  function openSellModal(group){
+    renderSellStep(group);
     sellOverlay.classList.add('open');
   }
 
-  function renderSellStep(holding){
-    const suggested = holding.amount;
+  function renderSellStep(group){
+    const suggested = group.amount;
+    const maxQty = group.ids.length;
     sellContent.innerHTML = `
       <h2 id="sell-modal-title">Mettre en vente</h2>
-      <p class="modal-loc">${holding.name}</p>
-      <p class="modal-desc">Vous avez investi ${formatEUR(holding.amount)} dans ce projet. Fixez le prix auquel vous souhaitez céder ce titre sur le marché secondaire — un autre investisseur pourra l'acheter à ce prix.</p>
+      <p class="modal-loc">${group.name}</p>
+      <p class="modal-desc">Vous détenez ${maxQty > 1 ? maxQty + ' titres identiques' : '1 titre'} de ${formatEUR(group.amount)} sur ce projet. Choisissez combien en céder et fixez le prix unitaire demandé sur le marché secondaire.</p>
 
       <div class="invest-form">
-        <label for="sell-price-input">Prix de vente demandé</label>
+        ${maxQty > 1 ? `
+        <label for="sell-qty-input">Nombre de titres à vendre</label>
+        <div class="qty-row">
+          <button type="button" class="qty-btn" id="sell-qty-minus" aria-label="Diminuer">−</button>
+          <input type="number" id="sell-qty-input" min="1" max="${maxQty}" step="1" value="1">
+          <button type="button" class="qty-btn" id="sell-qty-plus" aria-label="Augmenter">+</button>
+        </div>
+        <p class="qty-hint">Sur les ${maxQty} titres identiques détenus.</p>
+        ` : ''}
+
+        <label for="sell-price-input">Prix de vente demandé (par titre)</label>
         <div class="sell-price-row">
           <input type="number" id="sell-price-input" min="1" step="1" value="${suggested}">
           <span class="sell-price-suffix">€</span>
@@ -128,19 +182,31 @@
           <button class="preset-btn" data-pct="20">+20 %</button>
         </div>
 
-        <button class="btn btn-primary modal-confirm-btn" id="confirm-sell">Mettre en vente à <span id="confirm-sell-price">${formatEUR(suggested)}</span></button>
+        <button class="btn btn-primary modal-confirm-btn" id="confirm-sell"><span id="confirm-sell-label">Mettre en vente à ${formatEUR(suggested)}</span></button>
       </div>
     `;
 
     const input = document.getElementById('sell-price-input');
     const hint = document.getElementById('sell-price-hint');
-    const confirmPrice = document.getElementById('confirm-sell-price');
+    const confirmLabel = document.getElementById('confirm-sell-label');
     const presets = sellContent.querySelectorAll('.preset-btn');
+    const qtyInput = document.getElementById('sell-qty-input');
+    const qtyMinus = document.getElementById('sell-qty-minus');
+    const qtyPlus = document.getElementById('sell-qty-plus');
 
-    function updateHint(price){
-      const diff = price - holding.amount;
-      const pct = (diff / holding.amount) * 100;
-      confirmPrice.textContent = formatEUR(price);
+    function currentQty(){
+      if(!qtyInput) return 1;
+      let v = parseInt(qtyInput.value, 10);
+      if(isNaN(v) || v < 1) v = 1;
+      if(v > maxQty) v = maxQty;
+      return v;
+    }
+
+    function updateLabel(){
+      const price = parseFloat(input.value) || 0;
+      const qty = currentQty();
+      const diff = price - group.amount;
+      const pct = (diff / group.amount) * 100;
       if(Math.abs(pct) < 0.5){
         hint.textContent = 'Identique à votre montant investi (vente au pair).';
       } else if(pct > 0){
@@ -148,23 +214,32 @@
       } else {
         hint.textContent = `Décote de ${Math.abs(pct).toFixed(0)} % — vente plus rapide, mais à perte.`;
       }
+      confirmLabel.textContent = qty > 1
+        ? `Mettre en vente ${qty} titres à ${formatEUR(price)} chacun`
+        : `Mettre en vente à ${formatEUR(price)}`;
     }
 
     input.addEventListener('input', () => {
-      const val = parseFloat(input.value) || 0;
-      updateHint(val);
+      updateLabel();
       presets.forEach(b => b.classList.remove('active'));
     });
 
     presets.forEach(btn => {
       btn.addEventListener('click', () => {
         const pct = parseInt(btn.dataset.pct);
-        const price = Math.round(holding.amount * (1 + pct/100));
+        const price = Math.round(group.amount * (1 + pct/100));
         input.value = price;
-        updateHint(price);
+        updateLabel();
         presets.forEach(b => b.classList.toggle('active', b === btn));
       });
     });
+
+    if(qtyInput){
+      qtyMinus.addEventListener('click', () => { qtyInput.value = Math.max(1, currentQty() - 1); updateLabel(); });
+      qtyPlus.addEventListener('click', () => { qtyInput.value = Math.min(maxQty, currentQty() + 1); updateLabel(); });
+      qtyInput.addEventListener('input', updateLabel);
+      qtyInput.addEventListener('blur', () => { qtyInput.value = currentQty(); updateLabel(); });
+    }
 
     document.getElementById('confirm-sell').addEventListener('click', () => {
       const finalPrice = parseFloat(input.value);
@@ -172,23 +247,25 @@
         hint.textContent = 'Indiquez un prix valide.';
         return;
       }
-      NokoStore.listForSale(holding.id, finalPrice);
-      renderSellSuccess(holding, finalPrice);
+      const qty = currentQty();
+      const idsToSell = group.ids.slice(0, qty);
+      idsToSell.forEach(id => window.NokoStore.listForSale(id, finalPrice));
+      renderSellSuccess(group, finalPrice, qty);
       renderHoldings();
     });
   }
 
-  function renderSellSuccess(holding, price){
+  function renderSellSuccess(group, price, qty){
     sellContent.innerHTML = `
       <div class="modal-success">
         <div class="modal-success-icon">✓</div>
-        <h2 id="sell-modal-title">Titre mis en vente</h2>
-        <p>Votre titre ${holding.name} est désormais proposé à ${formatEUR(price)} sur le marché secondaire NoKo.</p>
+        <h2 id="sell-modal-title">${qty > 1 ? 'Titres mis en vente' : 'Titre mis en vente'}</h2>
+        <p>${qty > 1 ? qty + ' titres' : 'Votre titre'} ${group.name} ${qty > 1 ? 'sont désormais proposés' : 'est désormais proposé'} à ${formatEUR(price)} ${qty > 1 ? 'chacun' : ''} sur le marché secondaire NoKo.</p>
         <button class="btn btn-primary" id="close-sell-success">Fermer</button>
       </div>
     `;
     document.getElementById('close-sell-success').addEventListener('click', closeSellModal);
-    showToast(`Titre mis en vente à ${formatEUR(price)}`);
+    showToast(`${qty > 1 ? qty + ' titres mis' : 'Titre mis'} en vente à ${formatEUR(price)}`);
   }
 
   function closeSellModal(){ sellOverlay.classList.remove('open'); }
@@ -217,7 +294,7 @@
   }
 
   function renderMarket(filter){
-    const list = filter === 'tous' ? NOKO_MARKET_LISTINGS : NOKO_MARKET_LISTINGS.filter(l => priceCategory(l) === filter);
+    const list = filter === 'tous' ? window.NOKO_MARKET_LISTINGS : window.NOKO_MARKET_LISTINGS.filter(l => priceCategory(l) === filter);
 
     marketGrid.innerHTML = list.map(listing => {
       const diff = priceDiffLabel(listing);
@@ -254,7 +331,7 @@
   }
 
   function openBuyModal(listingId){
-    const listing = NOKO_MARKET_LISTINGS.find(l => l.id === listingId);
+    const listing = window.NOKO_MARKET_LISTINGS.find(l => l.id === listingId);
     if(!listing) return;
     renderBuyStep(listing);
     buyOverlay.classList.add('open');
@@ -322,7 +399,7 @@
     confirmBtn.addEventListener('click', () => {
       const qty = clampQty(qtyInput.value);
       for(let i = 0; i < qty; i++){
-        NokoStore.addHolding({
+        window.NokoStore.addHolding({
           projectId: listing.id,
           name: listing.projectName,
           amount: listing.askPrice,
@@ -406,7 +483,7 @@
           raw || '(vide ou absente)',
           '',
           'NokoStore.getHoldings() :',
-          JSON.stringify(NokoStore.getHoldings(), null, 2)
+          JSON.stringify(window.NokoStore.getHoldings(), null, 2)
         ];
         content.textContent = lines.join('\n');
       }

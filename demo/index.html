@@ -4,12 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Démo — NoKo</title>
-<meta name="description" content="Démonstration de la plateforme NoKo : parcourez des projets de TPE en difficulté et simulez un investissement.">
+<meta name="description" content="Démonstration de la plateforme NoKo : parcourez des projets de TPE en difficulté, investissez et échangez vos titres sur le marché secondaire.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../style.css">
 <link rel="stylesheet" href="demo.css">
+<link rel="stylesheet" href="portefeuille.css">
 </head>
 <body>
 
@@ -20,7 +21,8 @@
     <a href="../" class="logo">NoKo</a>
     <nav class="nav-links">
       <a href="#projets">Projets</a>
-      <a href="portefeuille.html">Mon portefeuille</a>
+      <a href="#mes-titres">Mon portefeuille</a>
+      <a href="#marche-secondaire">Marché secondaire</a>
     </nav>
     <a href="../" class="btn btn-ghost nav-cta">← Retour au site</a>
   </div>
@@ -29,7 +31,7 @@
 <main>
   <section class="demo-banner">
     <span class="demo-tag">Démonstration</span>
-    <p>Ceci est une simulation à but illustratif. Aucun fonds réel n'est engagé, aucune entreprise listée n'est réelle.</p>
+    <p>Simulation à but illustratif. Aucun fonds réel n'est engagé, aucune entreprise ni aucun vendeur listé n'est réel.</p>
   </section>
 
   <section class="demo-hero">
@@ -38,6 +40,7 @@
     <p class="hero-sub-light">Chaque projet a été noté par NoKo sur 4 axes avant d'être listé : financier, écologique, social, gouvernance.</p>
   </section>
 
+  <!-- PROJETS -->
   <section class="section" id="projets">
     <div class="filters">
       <button class="filter-chip active" data-filter="tous">Tous</button>
@@ -57,33 +60,66 @@
     </div>
   </div>
 
-  <section class="section section-dark" id="portefeuille">
+  <!-- MES TITRES -->
+  <section class="section section-dark" id="mes-titres">
     <p class="eyebrow">Mon portefeuille</p>
-    <h2>Vos investissements simulés</h2>
-    <p class="section-intro">Chaque investissement que vous confirmez ci-dessus apparaît ici. Pour revendre un titre ou en acheter sur le marché secondaire, rendez-vous sur la page <a href="portefeuille.html" class="inline-link">Mon portefeuille</a>.</p>
+    <h2>Vos titres</h2>
+    <p class="section-intro">Chaque investissement confirmé ci-dessus apparaît ici. Mettez un titre en vente à votre prix, ou retirez-le du marché à tout moment.</p>
 
-    <div id="portfolio-empty" class="portfolio-empty">
-      <p>Vous n'avez encore investi dans aucun projet.</p>
-      <p class="portfolio-empty-sub">Choisissez une entreprise ci-dessus pour commencer — dès 10 €.</p>
+    <div id="holdings-empty" class="portfolio-empty">
+      <p>Vous n'avez encore aucun titre.</p>
+      <p class="portfolio-empty-sub">Choisissez une entreprise ci-dessus, ou achetez un titre plus bas sur le marché secondaire.</p>
     </div>
 
-    <div id="portfolio-summary" class="portfolio-summary" hidden>
+    <div id="holdings-summary" class="portfolio-summary" hidden>
       <div class="summary-card">
-        <span class="summary-label">Total investi</span>
-        <span class="summary-value" id="summary-total">0 €</span>
+        <span class="summary-label">Valeur du portefeuille</span>
+        <span class="summary-value" id="holdings-total">0 €</span>
       </div>
       <div class="summary-card">
-        <span class="summary-label">Projets soutenus</span>
-        <span class="summary-value" id="summary-count">0</span>
+        <span class="summary-label">Titres détenus</span>
+        <span class="summary-value" id="holdings-count">0</span>
       </div>
       <div class="summary-card">
-        <span class="summary-label">Rendement annuel estimé</span>
-        <span class="summary-value" id="summary-yield">0 €</span>
+        <span class="summary-label">En vente</span>
+        <span class="summary-value" id="holdings-on-sale">0</span>
       </div>
     </div>
 
-    <div id="portfolio-list" class="portfolio-list"></div>
+    <div id="holdings-list" class="holdings-list"></div>
   </section>
+
+  <!-- Modal mise en vente -->
+  <div class="modal-overlay" id="sell-modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sell-modal-title">
+      <button class="modal-close" id="sell-modal-close" aria-label="Fermer">×</button>
+      <div id="sell-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- MARCHE SECONDAIRE -->
+  <section class="section" id="marche-secondaire">
+    <p class="eyebrow">Marché secondaire</p>
+    <h2>Des titres déjà financés, vendus par d'autres investisseurs.</h2>
+    <p class="section-intro">Ces projets ont atteint leur objectif de collecte. Les investisseurs d'origine proposent ici de céder leur titre avant l'échéance — à vous de juger si le prix demandé est intéressant.</p>
+
+    <div class="filters" id="market-filters">
+      <button class="filter-chip active" data-filter="tous">Tous</button>
+      <button class="filter-chip" data-filter="decote">Décote</button>
+      <button class="filter-chip" data-filter="prime">Prime</button>
+      <button class="filter-chip" data-filter="pair">Au pair</button>
+    </div>
+
+    <div class="market-grid" id="market-grid"></div>
+  </section>
+
+  <!-- Modal achat marché secondaire -->
+  <div class="modal-overlay" id="buy-modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="buy-modal-title">
+      <button class="modal-close" id="buy-modal-close" aria-label="Fermer">×</button>
+      <div id="buy-modal-content"></div>
+    </div>
+  </div>
 </main>
 
 <footer class="footer">
@@ -91,7 +127,9 @@
   <span><a href="../">Retour à la landing page</a></span>
 </footer>
 
-<script src="portfolio-store.js?v=3"></script>
-<script src="demo.js?v=3"></script>
+<script src="portfolio-store.js?v=4"></script>
+<script src="secondary-market.js?v=4"></script>
+<script src="demo.js?v=4"></script>
+<script src="portefeuille.js?v=4"></script>
 </body>
 </html>

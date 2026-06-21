@@ -39,6 +39,13 @@
 }
 .holding-main{ display: flex; flex-direction: column; gap: 4px; }
 .holding-name{ font-family: var(--font-display); font-weight: 600; font-size: 17px; }
+.holding-qty-tag{
+  font-family: var(--font-mono); font-weight: 700; font-size: 12px;
+  color: var(--green-mid);
+  background: rgba(63,174,73,0.12);
+  padding: 2px 7px; border-radius: 100px;
+  margin-right: 8px;
+}
 .holding-meta{ font-family: var(--font-mono); font-size: 12px; color: var(--green-mid); }
 
 .holding-right{ display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
@@ -106,8 +113,8 @@
 .market-card-body{ padding: 14px 22px 22px; flex: 1; display: flex; flex-direction: column; }
 .market-card-body .project-name{ color: var(--cream); }
 .market-card-body .project-loc{ color: rgba(246,244,236,0.55); }
-.market-seller{ font-size: 13.5px; color: rgba(246,244,236,0.65); margin: 4px 0 16px; }
-.market-seller strong{ color: var(--cream); }
+.market-seller{ font-size: 11px; color: rgba(246,244,236,0.45); margin: 4px 0 16px; }
+.market-seller strong{ color: rgba(246,244,236,0.6); font-weight: 500; }
 
 .market-remaining{ margin-bottom: 16px; }
 .market-remaining .progress-bar{ background: rgba(246,244,236,0.12); }
