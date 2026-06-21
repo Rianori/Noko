@@ -119,8 +119,6 @@
 .market-card-body{ padding: 14px 22px 22px; flex: 1; display: flex; flex-direction: column; }
 .market-card-body .project-name{ color: var(--forest); }
 .market-card-body .project-loc{ color: var(--green-mid); }
-.market-seller{ font-size: 11px; color: rgba(11,43,31,0.4); margin: 4px 0 16px; }
-.market-seller strong{ color: rgba(11,43,31,0.55); font-weight: 500; }
 
 .market-remaining{ margin-bottom: 16px; }
 .market-remaining .progress-bar{ background: rgba(11,43,31,0.1); }

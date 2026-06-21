@@ -306,8 +306,7 @@
           </div>
           <div class="market-card-body">
             <span class="project-name">${listing.projectName}</span>
-            <span class="project-loc">${listing.loc}</span>
-            <p class="market-seller">Investissement initial ${formatEUR(listing.originalAmount)}</p>${remainingBlock}
+            <span class="project-loc">${listing.loc}</span>${remainingBlock}
             <div class="project-footer market-footer">
               <div>
                 <span class="project-rate">${formatEUR(listing.askPrice)}</span>
