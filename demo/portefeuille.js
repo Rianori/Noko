@@ -316,7 +316,7 @@
           <div class="market-card-body">
             <span class="project-name">${listing.projectName}</span>
             <span class="project-loc">${listing.loc}</span>
-            <p class="market-seller">Vendu par <strong>${listing.seller}</strong> · investissement initial ${formatEUR(listing.originalAmount)}</p>
+            <p class="market-seller">Investissement initial ${formatEUR(listing.originalAmount)}</p>
             <div class="market-remaining">
               <div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%"></div></div>
               <span class="progress-meta-single">${listing.remainingMonths} mois restants sur ${listing.totalMonths}</span>
@@ -326,7 +326,6 @@
                 <span class="project-rate">${formatEUR(listing.askPrice)}</span>
                 <span class="project-rate-label">prix demandé</span>
               </div>
-              <span class="project-rate-label">${listing.rate ? listing.rate + ' % indicatif' : 'gain en capital'}</span>
             </div>
           </div>
         </article>
@@ -346,11 +345,11 @@
   }
 
   function renderBuyStep(listing){
-    const diff = priceDiffLabel(listing);
+    const isCapital = listing.projectType === 'capital';
     buyContent.innerHTML = `
       <h2 id="buy-modal-title">${listing.projectName}</h2>
       <p class="modal-loc">${listing.loc}</p>
-      <p class="modal-desc">Titre cédé par <strong>${listing.seller}</strong>, investisseur d'origine. Ce projet a déjà atteint son objectif de collecte ; il ne s'agit pas d'un nouvel investissement dans l'entreprise mais du rachat d'un titre existant.</p>
+      <p class="modal-desc">Ce projet a déjà atteint son objectif de collecte ; il ne s'agit pas d'un nouvel investissement dans l'entreprise mais du rachat d'un titre existant auprès d'un autre investisseur.</p>
       <div class="modal-scores">${scoreBlock(listing.scores)}</div>
 
       <div class="invest-form">
@@ -360,14 +359,11 @@
           <input type="number" id="buy-qty-input" min="1" max="20" step="1" value="1">
           <button type="button" class="qty-btn" id="qty-plus" aria-label="Augmenter">+</button>
         </div>
-        <p class="qty-hint">Le vendeur ${listing.seller} propose plusieurs titres identiques à ce prix unitaire.</p>
+        <p class="qty-hint">Plusieurs titres identiques sont proposés à ce prix unitaire.</p>
 
         <div class="invest-summary buy-summary">
-          <div class="invest-summary-row"><span>Montant initialement investi (par titre)</span><span>${formatEUR(listing.originalAmount)}</span></div>
           <div class="invest-summary-row"><span>Prix demandé (par titre)</span><span>${formatEUR(listing.askPrice)}</span></div>
-          <div class="invest-summary-row"><span>Écart par rapport au nominal</span><span class="${diff.cls}">${diff.text}</span></div>
-          <div class="invest-summary-row"><span>Durée restante</span><span>${listing.remainingMonths} mois sur ${listing.totalMonths}</span></div>
-          <div class="invest-summary-row"><span>${listing.rate ? 'Taux indicatif restant' : 'Nature du gain'}</span><span>${listing.rate ? listing.rate + ' %' : 'Plus-value à la sortie'}</span></div>
+          ${isCapital ? '' : `<div class="invest-summary-row"><span>Durée restante</span><span>${listing.remainingMonths} mois sur ${listing.totalMonths}</span></div>`}
           <div class="invest-summary-row invest-summary-total"><span>Total à payer</span><span id="buy-total-price">${formatEUR(listing.askPrice)}</span></div>
         </div>
 
@@ -433,7 +429,7 @@
       <div class="modal-success">
         <div class="modal-success-icon">✓</div>
         <h2 id="buy-modal-title">Achat simulé</h2>
-        <p>Vous avez racheté ${titreLabel} de ${listing.seller} sur ${listing.projectName} pour ${formatEUR(total)} au total. ${qty > 1 ? 'Ils apparaissent' : 'Il apparaît'} maintenant dans vos titres, ci-dessus.</p>
+        <p>Vous avez racheté ${titreLabel} sur ${listing.projectName} pour ${formatEUR(total)} au total. ${qty > 1 ? 'Ils apparaissent' : 'Il apparaît'} maintenant dans vos titres, ci-dessus.</p>
         <button class="btn btn-primary" id="close-buy-success">Voir mes titres</button>
       </div>
     `;

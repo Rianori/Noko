@@ -54,6 +54,7 @@ window.NokoStore = (function(){
     /** Ajoute un nouveau titre suite à un investissement (page Projets ou achat sur le marché) */
     addHolding(holding){
       const items = load();
+      const countBefore = items.length;
       items.push(Object.assign({
         id: genId(),
         status: 'actif', // 'actif' | 'en_vente'
@@ -61,7 +62,16 @@ window.NokoStore = (function(){
         acquiredAt: Date.now()
       }, holding));
       save(items);
-      return items;
+
+      const verify = load();
+      console.log(`NokoStore.addHolding: ${countBefore} titre(s) avant, ${verify.length} après ajout de "${holding.name}".`);
+      if(verify.length !== countBefore + 1){
+        console.error(`NokoStore: écart de persistance détecté sur addHolding. Attendu ${countBefore + 1}, trouvé ${verify.length}.`);
+        if(typeof window.NokoShowStorageWarning === 'function'){
+          window.NokoShowStorageWarning(countBefore + 1, verify.length);
+        }
+      }
+      return verify;
     },
 
     /** Ajoute plusieurs titres identiques en une seule opération atomique (achat groupé sur le marché secondaire) */
