@@ -64,6 +64,21 @@ window.NokoStore = (function(){
       return items;
     },
 
+    /** Ajoute plusieurs titres identiques en une seule opération atomique (achat groupé sur le marché secondaire) */
+    addMultipleHoldings(holdingTemplate, qty){
+      const items = load();
+      for(let i = 0; i < qty; i++){
+        items.push(Object.assign({
+          id: genId() + '_' + i,
+          status: 'actif',
+          askPrice: null,
+          acquiredAt: Date.now()
+        }, holdingTemplate));
+      }
+      save(items);
+      return items;
+    },
+
     /** Met un titre en vente à un prix fixé par l'utilisateur */
     listForSale(holdingId, askPrice){
       const items = load();

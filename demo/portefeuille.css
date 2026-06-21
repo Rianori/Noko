@@ -89,14 +89,17 @@
 
 .market-card{
   display: flex; flex-direction: column;
-  border: 1px solid rgba(246,244,236,0.15);
+  border: 1px solid rgba(11,43,31,0.15);
   border-radius: var(--radius);
   overflow: hidden;
-  background: rgba(246,244,236,0.04);
+  background: var(--cream);
   cursor: pointer;
-  transition: transform 0.15s, border-color 0.15s;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
-.market-card:hover{ transform: translateY(-3px); border-color: var(--green-acid); }
+.market-card:hover{
+  transform: translateY(-3px); border-color: var(--green-vivid);
+  box-shadow: 0 8px 24px rgba(11,43,31,0.08);
+}
 
 .market-card-top{
   padding: 22px 22px 0;
@@ -106,27 +109,27 @@
   font-family: var(--font-mono); font-size: 11px; font-weight: 700;
   padding: 4px 9px; border-radius: 3px; white-space: nowrap;
 }
-.diff-pair{ background: rgba(246,244,236,0.12); color: rgba(246,244,236,0.75); }
-.diff-prime{ background: rgba(168,224,99,0.18); color: var(--green-acid); }
-.diff-decote{ background: rgba(168,224,99,0.08); color: rgba(168,224,99,0.65); }
+.diff-pair{ background: rgba(11,43,31,0.08); color: var(--green-mid); }
+.diff-prime{ background: rgba(63,174,73,0.14); color: var(--green-mid); }
+.diff-decote{ background: rgba(181,101,29,0.12); color: #b5651d; }
 
 .market-card-body{ padding: 14px 22px 22px; flex: 1; display: flex; flex-direction: column; }
-.market-card-body .project-name{ color: var(--cream); }
-.market-card-body .project-loc{ color: rgba(246,244,236,0.55); }
-.market-seller{ font-size: 11px; color: rgba(246,244,236,0.45); margin: 4px 0 16px; }
-.market-seller strong{ color: rgba(246,244,236,0.6); font-weight: 500; }
+.market-card-body .project-name{ color: var(--forest); }
+.market-card-body .project-loc{ color: var(--green-mid); }
+.market-seller{ font-size: 11px; color: rgba(11,43,31,0.4); margin: 4px 0 16px; }
+.market-seller strong{ color: rgba(11,43,31,0.55); font-weight: 500; }
 
 .market-remaining{ margin-bottom: 16px; }
-.market-remaining .progress-bar{ background: rgba(246,244,236,0.12); }
-.market-remaining .progress-fill{ background: var(--green-acid); }
+.market-remaining .progress-bar{ background: rgba(11,43,31,0.1); }
+.market-remaining .progress-fill{ background: var(--green-vivid); }
 .progress-meta-single{
-  font-family: var(--font-mono); font-size: 12px; color: rgba(246,244,236,0.55);
+  font-family: var(--font-mono); font-size: 12px; color: var(--green-mid);
   display: block; margin-top: 8px;
 }
 
-.market-footer{ border-top-color: rgba(246,244,236,0.1) !important; }
-.market-card-body .project-rate{ color: var(--green-acid); }
-.market-card-body .project-rate-label{ color: rgba(246,244,236,0.5); }
+.market-footer{ border-top-color: rgba(11,43,31,0.08) !important; }
+.market-card-body .project-rate{ color: var(--forest); }
+.market-card-body .project-rate-label{ color: var(--green-mid); }
 
 /* Buy modal */
 .buy-summary{ background: var(--cream-dim) !important; color: var(--forest) !important; margin-top: 4px; }

@@ -104,6 +104,7 @@ h1, h2, h3{
   cursor: pointer;
   transition: transform 0.15s, background 0.15s, color 0.15s, border-color 0.15s;
 }
+.btn:disabled{ opacity: 0.5; cursor: not-allowed; transform: none !important; }
 .btn-primary{
   background: var(--green-vivid); color: var(--forest-deep);
 }

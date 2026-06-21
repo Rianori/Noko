@@ -173,11 +173,11 @@
           <input type="number" id="sell-price-input" min="1" step="1" value="${suggested}">
           <span class="sell-price-suffix">€</span>
         </div>
-        <p class="sell-price-hint" id="sell-price-hint">Identique à votre montant investi (vente au pair).</p>
+        <p class="sell-price-hint" id="sell-price-hint">Identique à votre montant investi.</p>
 
         <div class="invest-presets">
           <button class="preset-btn" data-pct="-10">−10 %</button>
-          <button class="preset-btn active" data-pct="0">Au pair</button>
+          <button class="preset-btn active" data-pct="0">Prix initial</button>
           <button class="preset-btn" data-pct="10">+10 %</button>
           <button class="preset-btn" data-pct="20">+20 %</button>
         </div>
@@ -208,7 +208,7 @@
       const diff = price - group.amount;
       const pct = (diff / group.amount) * 100;
       if(Math.abs(pct) < 0.5){
-        hint.textContent = 'Identique à votre montant investi (vente au pair).';
+        hint.textContent = 'Identique à votre montant investi.';
       } else if(pct > 0){
         hint.textContent = `Prime de ${pct.toFixed(0)} % par rapport à votre investissement initial.`;
       } else {
@@ -396,19 +396,23 @@
     qtyInput.addEventListener('input', () => syncQty(qtyInput.value));
     qtyInput.addEventListener('blur', () => syncQty(qtyInput.value));
 
+    let purchaseInProgress = false;
     confirmBtn.addEventListener('click', () => {
+      if(purchaseInProgress) return;
+      purchaseInProgress = true;
+      confirmBtn.disabled = true;
+
       const qty = clampQty(qtyInput.value);
-      for(let i = 0; i < qty; i++){
-        window.NokoStore.addHolding({
-          projectId: listing.id,
-          name: listing.projectName,
-          amount: listing.askPrice,
-          rate: listing.rate,
-          type: listing.typeLabel + ' (marché secondaire)',
-          projectType: listing.projectType,
-          duration: `${listing.remainingMonths} mois restants`
-        });
-      }
+      window.NokoStore.addMultipleHoldings({
+        projectId: listing.id,
+        name: listing.projectName,
+        amount: listing.askPrice,
+        rate: listing.rate,
+        type: listing.typeLabel + ' (marché secondaire)',
+        projectType: listing.projectType,
+        duration: `${listing.remainingMonths} mois restants`
+      }, qty);
+
       renderBuySuccess(listing, qty);
       renderHoldings();
     });
