@@ -27,7 +27,7 @@
       id: 'p4', name: 'Ferme du Gers — maraîchage bio', loc: 'Gers · Exploitation agricole',
       type: 'capital', typeLabel: 'Apport en capital',
       desc: "Conversion en agriculture biologique nécessitant un investissement initial en matériel et en certification, avant la montée en rendement.",
-      target: 45000, raised: 21000, rate: null, duration: 'Sortie 4-6 ans',
+      target: 45000, raised: 21000, rate: null, duration: 'Apport en capital',
       scores: { financier: 3, ecologique: 5, social: 4, gouvernance: 4 }
     },
     {
@@ -48,7 +48,7 @@
       id: 'p7', name: 'Imprimerie Solaire', loc: 'Montpellier · Imprimerie écoresponsable',
       type: 'capital', typeLabel: 'Apport en capital',
       desc: "Acquisition d'une nouvelle presse basse consommation pour réduire les coûts énergétiques et répondre à une demande croissante.",
-      target: 38000, raised: 11400, rate: null, duration: 'Sortie 4-6 ans',
+      target: 38000, raised: 11400, rate: null, duration: 'Apport en capital',
       scores: { financier: 4, ecologique: 5, social: 3, gouvernance: 5 }
     },
     {
