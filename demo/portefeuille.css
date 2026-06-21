@@ -113,15 +113,8 @@
 
 .market-card-top{
   padding: 22px 22px 0;
-  display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+  display: flex; justify-content: flex-start;
 }
-.market-diff{
-  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
-  padding: 4px 9px; border-radius: 3px; white-space: nowrap;
-}
-.diff-pair{ background: rgba(11,43,31,0.08); color: var(--green-mid); }
-.diff-prime{ background: rgba(63,174,73,0.14); color: var(--green-mid); }
-.diff-decote{ background: rgba(181,101,29,0.12); color: #b5651d; }
 
 .market-card-body{ padding: 14px 22px 22px; flex: 1; display: flex; flex-direction: column; }
 .market-card-body .project-name{ color: var(--forest); }
@@ -144,9 +137,6 @@
 /* Buy modal */
 .buy-summary{ background: var(--cream-dim) !important; color: var(--forest) !important; margin-top: 4px; }
 .buy-summary .invest-summary-row span:last-child{ color: var(--forest) !important; font-family: var(--font-mono); }
-.buy-summary .diff-prime{ color: var(--green-mid) !important; font-weight: 700; }
-.buy-summary .diff-decote{ color: #b5651d !important; font-weight: 700; }
-.buy-summary .diff-pair{ color: var(--green-mid) !important; }
 .buy-disclaimer{ font-size: 12.5px; color: var(--green-mid); margin: 16px 0 24px; }
 
 /* Sélecteur de quantité (achat multiple marché secondaire) */

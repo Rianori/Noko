@@ -294,24 +294,15 @@
     return diffPct > 0 ? 'prime' : 'decote';
   }
 
-  function priceDiffLabel(listing){
-    const diffPct = ((listing.askPrice - listing.originalAmount) / listing.originalAmount) * 100;
-    if(Math.abs(diffPct) < 1) return { text: 'Au pair', cls: 'diff-pair' };
-    if(diffPct > 0) return { text: `+${diffPct.toFixed(0)} %`, cls: 'diff-prime' };
-    return { text: `${diffPct.toFixed(0)} %`, cls: 'diff-decote' };
-  }
-
   function renderMarket(filter){
     const list = filter === 'tous' ? window.NOKO_MARKET_LISTINGS : window.NOKO_MARKET_LISTINGS.filter(l => priceCategory(l) === filter);
 
     marketGrid.innerHTML = list.map(listing => {
-      const diff = priceDiffLabel(listing);
       const progressPct = Math.round((listing.remainingMonths / listing.totalMonths) * 100);
       return `
         <article class="market-card" data-id="${listing.id}">
           <div class="market-card-top">
             <span class="project-type">${listing.typeLabel}</span>
-            <span class="market-diff ${diff.cls}">${diff.text}</span>
           </div>
           <div class="market-card-body">
             <span class="project-name">${listing.projectName}</span>
