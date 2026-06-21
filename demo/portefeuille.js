@@ -288,14 +288,8 @@
   const buyContent = document.getElementById('buy-modal-content');
   const buyClose = document.getElementById('buy-modal-close');
 
-  function priceCategory(listing){
-    const diffPct = ((listing.askPrice - listing.originalAmount) / listing.originalAmount) * 100;
-    if(Math.abs(diffPct) < 1) return 'pair';
-    return diffPct > 0 ? 'prime' : 'decote';
-  }
-
   function renderMarket(filter){
-    const list = filter === 'tous' ? window.NOKO_MARKET_LISTINGS : window.NOKO_MARKET_LISTINGS.filter(l => priceCategory(l) === filter);
+    const list = filter === 'tous' ? window.NOKO_MARKET_LISTINGS : window.NOKO_MARKET_LISTINGS.filter(l => l.projectType === filter);
 
     marketGrid.innerHTML = list.map(listing => {
       const progressPct = Math.round((listing.remainingMonths / listing.totalMonths) * 100);

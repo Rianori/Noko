@@ -325,9 +325,9 @@
   }
 
   // Filters
-  document.querySelectorAll('.filter-chip').forEach(chip => {
+  document.querySelectorAll('#projets .filter-chip').forEach(chip => {
     chip.addEventListener('click', () => {
-      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('#projets .filter-chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
       renderProjects(chip.dataset.filter);
     });
