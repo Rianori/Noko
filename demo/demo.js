@@ -102,7 +102,7 @@
     }
   ];
 
-  const portfolio = []; // { projectId, name, amount, rate }
+  window.NOKO_PROJECTS = PROJECTS; // réutilisé par la page Marché secondaire
 
   const grid = document.getElementById('project-grid');
   const modalOverlay = document.getElementById('modal-overlay');
@@ -225,7 +225,9 @@
 
     document.getElementById('confirm-invest').addEventListener('click', () => {
       const finalAmount = parseInt(slider.value);
-      portfolio.push({ name: p.name, amount: finalAmount, rate: p.rate, type: p.typeLabel });
+      NokoStore.addHolding({
+        projectId: p.id, name: p.name, amount: finalAmount, rate: p.rate, type: p.typeLabel, projectType: p.type, duration: p.duration
+      });
       renderSuccessStep(p, finalAmount);
       renderPortfolio();
     });
@@ -241,8 +243,7 @@
       </div>
     `;
     document.getElementById('close-success').addEventListener('click', () => {
-      closeModal();
-      document.getElementById('portefeuille').scrollIntoView({ behavior: 'smooth' });
+      window.location.href = 'portefeuille.html';
     });
     showToast(`${formatEUR(amount)} investis dans ${p.name}`);
   }
@@ -263,6 +264,7 @@
     const empty = document.getElementById('portfolio-empty');
     const summary = document.getElementById('portfolio-summary');
     const list = document.getElementById('portfolio-list');
+    const portfolio = NokoStore.getHoldings();
 
     if(portfolio.length === 0){
       empty.hidden = false;
@@ -285,7 +287,7 @@
       <div class="portfolio-item">
         <div>
           <div class="portfolio-item-name">${item.name}</div>
-          <div class="portfolio-item-meta">${item.type}${item.rate ? ' · ' + item.rate + ' %' : ''}</div>
+          <div class="portfolio-item-meta">${item.type}${item.rate ? ' · ' + item.rate + ' %' : ''}${item.status === 'en_vente' ? ' · <span class=\"tag-en-vente\">En vente</span>' : ''}</div>
         </div>
         <span class="portfolio-item-amount">${formatEUR(item.amount)}</span>
       </div>

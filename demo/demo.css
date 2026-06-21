@@ -228,3 +228,13 @@
   border: 1px solid var(--green-acid);
 }
 .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.tag-en-vente{
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  color: var(--green-acid);
+}
+.inline-link{
+  color: var(--green-acid); text-decoration: underline;
+  text-decoration-color: rgba(168,224,99,0.4);
+}
+.inline-link:hover{ color: var(--cream); }

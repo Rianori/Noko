@@ -1,0 +1,130 @@
+/* ============================================
+   PORTEFEUILLE — styles spécifiques
+   ============================================ */
+
+.active-link{ color: var(--forest) !important; font-weight: 700; }
+
+.inline-link-dark{
+  color: var(--green-vivid); text-decoration: underline;
+  text-decoration-color: rgba(63,174,73,0.35);
+}
+.inline-link-dark:hover{ color: var(--forest); }
+
+/* Mes titres */
+.portfolio-summary-light{
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  margin: 40px 0 32px;
+}
+.summary-card-light{
+  padding: 22px; border-radius: 4px;
+  background: var(--cream-dim);
+  border: 1px solid rgba(11,43,31,0.12);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.summary-label-light{ font-size: 12.5px; color: var(--green-mid); }
+.summary-value-light{ font-family: var(--font-mono); font-weight: 700; font-size: 24px; color: var(--forest); }
+
+@media (max-width: 760px){
+  .portfolio-summary-light{ grid-template-columns: 1fr; }
+}
+
+.holdings-list{ display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+.holding-card{
+  display: flex; justify-content: space-between; align-items: center; gap: 20px;
+  padding: 20px 22px;
+  border: 1px solid rgba(11,43,31,0.12);
+  border-radius: 4px;
+  background: var(--cream);
+  flex-wrap: wrap;
+}
+.holding-main{ display: flex; flex-direction: column; gap: 4px; }
+.holding-name{ font-family: var(--font-display); font-weight: 600; font-size: 17px; }
+.holding-meta{ font-family: var(--font-mono); font-size: 12px; color: var(--green-mid); }
+
+.holding-right{ display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.holding-amount{ font-family: var(--font-mono); font-weight: 700; font-size: 18px; color: var(--forest); }
+
+.holding-sale-info{ display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.tag-en-vente-card{
+  font-family: var(--font-mono); font-size: 11.5px; font-weight: 700;
+  color: var(--green-mid);
+  background: rgba(63,174,73,0.12);
+  padding: 3px 9px; border-radius: 100px;
+}
+.btn-link-small{
+  background: none; border: none; cursor: pointer;
+  font-size: 12px; color: var(--green-mid); text-decoration: underline;
+  padding: 0;
+}
+.btn-link-small:hover{ color: var(--forest); }
+
+.btn-sm{ padding: 9px 16px !important; font-size: 13px !important; }
+
+/* Sell modal */
+.sell-price-row{ display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.sell-price-row input[type="number"]{
+  flex: 1; font-family: var(--font-mono); font-size: 22px; font-weight: 700;
+  border: 1.5px solid rgba(11,43,31,0.2); border-radius: 4px;
+  padding: 10px 14px; color: var(--forest);
+  background: var(--cream-dim);
+}
+.sell-price-row input[type="number"]:focus{ outline: none; border-color: var(--green-vivid); }
+.sell-price-suffix{ font-family: var(--font-mono); font-size: 18px; color: var(--green-mid); }
+.sell-price-hint{ font-size: 13px; color: var(--green-mid); margin: 0 0 20px; min-height: 18px; }
+
+/* Marché secondaire */
+.market-grid{
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  margin-top: 40px;
+}
+@media (max-width: 900px){ .market-grid{ grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px){ .market-grid{ grid-template-columns: 1fr; } }
+
+.market-card{
+  display: flex; flex-direction: column;
+  border: 1px solid rgba(246,244,236,0.15);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: rgba(246,244,236,0.04);
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.market-card:hover{ transform: translateY(-3px); border-color: var(--green-acid); }
+
+.market-card-top{
+  padding: 22px 22px 0;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+}
+.market-diff{
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  padding: 4px 9px; border-radius: 3px; white-space: nowrap;
+}
+.diff-pair{ background: rgba(246,244,236,0.12); color: rgba(246,244,236,0.75); }
+.diff-prime{ background: rgba(168,224,99,0.18); color: var(--green-acid); }
+.diff-decote{ background: rgba(168,224,99,0.08); color: rgba(168,224,99,0.65); }
+
+.market-card-body{ padding: 14px 22px 22px; flex: 1; display: flex; flex-direction: column; }
+.market-card-body .project-name{ color: var(--cream); }
+.market-card-body .project-loc{ color: rgba(246,244,236,0.55); }
+.market-seller{ font-size: 13.5px; color: rgba(246,244,236,0.65); margin: 4px 0 16px; }
+.market-seller strong{ color: var(--cream); }
+
+.market-remaining{ margin-bottom: 16px; }
+.market-remaining .progress-bar{ background: rgba(246,244,236,0.12); }
+.market-remaining .progress-fill{ background: var(--green-acid); }
+.progress-meta-single{
+  font-family: var(--font-mono); font-size: 12px; color: rgba(246,244,236,0.55);
+  display: block; margin-top: 8px;
+}
+
+.market-footer{ border-top-color: rgba(246,244,236,0.1) !important; }
+.market-card-body .project-rate{ color: var(--green-acid); }
+.market-card-body .project-rate-label{ color: rgba(246,244,236,0.5); }
+
+/* Buy modal */
+.buy-summary{ background: var(--cream-dim) !important; color: var(--forest) !important; margin-top: 4px; }
+.buy-summary .invest-summary-row span:last-child{ color: var(--forest) !important; font-family: var(--font-mono); }
+.buy-summary .diff-prime{ color: var(--green-mid) !important; font-weight: 700; }
+.buy-summary .diff-decote{ color: #b5651d !important; font-weight: 700; }
+.buy-summary .diff-pair{ color: var(--green-mid) !important; }
+.buy-disclaimer{ font-size: 12.5px; color: var(--green-mid); margin: 16px 0 24px; }
