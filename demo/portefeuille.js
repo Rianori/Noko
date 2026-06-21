@@ -1,6 +1,15 @@
 // portefeuille.js — page "Mon portefeuille" : mes titres + marché secondaire
 (function(){
 
+  if(typeof window.NokoStore === 'undefined' || typeof window.NOKO_MARKET_LISTINGS === 'undefined'){
+    console.error('Dépendances manquantes : vérifiez que portfolio-store.js et secondary-market.js sont chargés avant portefeuille.js');
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:#b5651d;color:#fff;padding:14px 20px;text-align:center;font-family:monospace;font-size:13px;';
+    banner.textContent = 'Erreur de chargement : le portefeuille ne peut pas fonctionner sur cette page (script manquant).';
+    document.body.prepend(banner);
+    return;
+  }
+
   function formatEUR(n){
     return Math.round(n).toLocaleString('fr-FR') + ' €';
   }

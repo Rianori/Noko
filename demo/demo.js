@@ -1,6 +1,15 @@
 // Démo produit NoKo — données fictives, en mémoire uniquement (pas de persistance)
 (function(){
 
+  if(typeof window.NokoStore === 'undefined'){
+    console.error('NokoStore introuvable : vérifiez que portfolio-store.js est chargé avant demo.js');
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:#b5651d;color:#fff;padding:14px 20px;text-align:center;font-family:monospace;font-size:13px;';
+    banner.textContent = 'Erreur de chargement : le portefeuille ne peut pas fonctionner sur cette page (script manquant).';
+    document.body.prepend(banner);
+    return;
+  }
+
   const PROJECTS = [
     {
       id: 'p1', name: 'Boulangerie Aux Trois Épis', loc: 'Lyon 7e · Boulangerie artisanale',
@@ -171,8 +180,14 @@
 
   function renderInvestStep(p, amount){
     const isEscompte = p.type === 'escompte';
+
+    if(isEscompte){
+      renderEscompteStep(p);
+      return;
+    }
+
     const gainEstimate = p.rate ? Math.round(amount * (p.rate/100) * 100) / 100 : null;
-    const yieldLabel = isEscompte ? 'Gain estimé au règlement' : (p.rate ? 'Rendement estimé / an' : 'Potentiel');
+    const yieldLabel = p.rate ? 'Rendement estimé / an' : 'Potentiel';
 
     modalContent.innerHTML = `
       <h2 id="modal-title">${p.name}</h2>
@@ -192,7 +207,7 @@
 
         <div class="invest-summary">
           <div class="invest-summary-row"><span>Type de financement</span><span>${p.typeLabel}</span></div>
-          <div class="invest-summary-row"><span>${isEscompte ? 'Échéance du règlement' : 'Durée'}</span><span>${p.duration}</span></div>
+          <div class="invest-summary-row"><span>Durée</span><span>${p.duration}</span></div>
           <div class="invest-summary-row"><span>${yieldLabel}</span><span>${p.rate ? formatEUR(gainEstimate) : 'Plus-value à la sortie'}</span></div>
         </div>
 
@@ -229,6 +244,37 @@
         projectId: p.id, name: p.name, amount: finalAmount, rate: p.rate, type: p.typeLabel, projectType: p.type, duration: p.duration
       });
       renderSuccessStep(p, finalAmount);
+      renderPortfolio();
+    });
+  }
+
+  function renderEscompteStep(p){
+    const gainEstimate = Math.round(p.target * (p.rate/100) * 100) / 100;
+
+    modalContent.innerHTML = `
+      <h2 id="modal-title">${p.name}</h2>
+      <p class="modal-loc">${p.loc}</p>
+      <p class="modal-desc">${p.desc}</p>
+      <div class="modal-scores">${scoreBlock(p.scores)}</div>
+
+      <div class="invest-form">
+        <div class="invest-summary">
+          <div class="invest-summary-row"><span>Type de financement</span><span>${p.typeLabel}</span></div>
+          <div class="invest-summary-row"><span>Montant de la facture</span><span>${formatEUR(p.target)}</span></div>
+          <div class="invest-summary-row"><span>Échéance du règlement</span><span>${p.duration}</span></div>
+          <div class="invest-summary-row"><span>Gain estimé au règlement</span><span>${formatEUR(gainEstimate)}</span></div>
+        </div>
+        <p class="escompte-note">Sur NoKo, une facture en escompte est achetée en totalité par un seul investisseur. Vous financez l'intégralité de cette facture, en échange du remboursement par l'entreprise à l'échéance, majoré du taux indiqué.</p>
+
+        <button class="btn btn-primary modal-confirm-btn" id="confirm-invest">Acheter cette facture pour ${formatEUR(p.target)}</button>
+      </div>
+    `;
+
+    document.getElementById('confirm-invest').addEventListener('click', () => {
+      NokoStore.addHolding({
+        projectId: p.id, name: p.name, amount: p.target, rate: p.rate, type: p.typeLabel, projectType: p.type, duration: p.duration
+      });
+      renderSuccessStep(p, p.target);
       renderPortfolio();
     });
   }

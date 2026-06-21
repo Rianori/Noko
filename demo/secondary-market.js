@@ -1,7 +1,7 @@
 // secondary-market.js — offres fictives du marché secondaire NoKo (démo)
 // Projets déjà financés (collecte terminée), revendus avant échéance par d'autres investisseurs fictifs.
 
-const NOKO_MARKET_LISTINGS = [
+window.NOKO_MARKET_LISTINGS = [
   {
     id: 'm1',
     projectName: 'Fromagerie des Hauts Plateaux',

@@ -238,3 +238,12 @@
   text-decoration-color: rgba(168,224,99,0.4);
 }
 .inline-link:hover{ color: var(--cream); }
+
+.escompte-note{
+  font-size: 13px; color: var(--green-mid);
+  background: var(--cream-dim);
+  border-left: 3px solid var(--green-vivid);
+  padding: 12px 16px;
+  margin: 0 0 24px;
+  border-radius: 0 4px 4px 0;
+}

@@ -2,25 +2,44 @@
 // Persisté en localStorage pour rester cohérent entre demo/index.html et demo/portefeuille.html
 // ATTENTION : ceci est une simulation pédagogique, aucune donnée ne sort du navigateur.
 
-const NokoStore = (function(){
+window.NokoStore = (function(){
   const KEY = 'noko_demo_portfolio_v1';
   const MARKET_KEY = 'noko_demo_market_v1';
 
+  // Fallback mémoire si localStorage est inaccessible (navigation privée stricte, etc.)
+  let memoryFallback = [];
+  let storageAvailable = true;
+  try{
+    const testKey = '__noko_test__';
+    localStorage.setItem(testKey, '1');
+    localStorage.removeItem(testKey);
+  }catch(e){
+    storageAvailable = false;
+    console.warn('NokoStore: localStorage indisponible, le portefeuille ne persistera pas entre les pages dans cette session.', e);
+  }
+
   function load(){
+    if(!storageAvailable) return memoryFallback;
     try{
       const raw = localStorage.getItem(KEY);
       return raw ? JSON.parse(raw) : [];
     }catch(e){
       console.warn('NokoStore: lecture portefeuille impossible', e);
-      return [];
+      return memoryFallback;
     }
   }
 
   function save(items){
+    if(!storageAvailable){
+      memoryFallback = items;
+      return;
+    }
     try{
       localStorage.setItem(KEY, JSON.stringify(items));
     }catch(e){
-      console.warn('NokoStore: écriture portefeuille impossible', e);
+      console.warn('NokoStore: écriture portefeuille impossible, bascule en mémoire pour cette session', e);
+      storageAvailable = false;
+      memoryFallback = items;
     }
   }
 
