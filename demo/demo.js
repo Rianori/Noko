@@ -18,7 +18,7 @@
     },
     {
       id: 'p3', name: 'Épicerie Bonjour Quartier', loc: 'Toulouse · Commerce de proximité',
-      type: 'escompte', typeLabel: 'Escompte',
+      type: 'pret', typeLabel: 'Prêt',
       desc: "Besoin de trésorerie rapide avant la période des fêtes pour financer un réassort fournisseur déjà commandé.",
       target: 9500, raised: 6200, rate: 10, duration: '3 mois',
       scores: { financier: 4, ecologique: 4, social: 5, gouvernance: 4 }
@@ -39,7 +39,7 @@
     },
     {
       id: 'p6', name: 'Salon Lumière', loc: 'Brest · Coiffure & esthétique',
-      type: 'escompte', typeLabel: 'Escompte',
+      type: 'pret', typeLabel: 'Prêt',
       desc: "Avance sur travaux de rénovation du local déjà engagés, en attente du remboursement par l'assurance dégât des eaux.",
       target: 7200, raised: 3100, rate: 10, duration: '4 mois',
       scores: { financier: 3, ecologique: 3, social: 4, gouvernance: 4 }
@@ -60,10 +60,45 @@
     },
     {
       id: 'p9', name: 'Atelier Cuir Verlhac', loc: 'Limoges · Maroquinerie',
-      type: 'escompte', typeLabel: 'Escompte',
+      type: 'pret', typeLabel: 'Prêt',
       desc: "Commande export confirmée, besoin d'une avance de trésorerie pour produire avant paiement à 60 jours du client.",
       target: 12000, raised: 8900, rate: 10, duration: '2 mois',
       scores: { financier: 4, ecologique: 3, social: 4, gouvernance: 4 }
+    },
+    {
+      id: 'p10', name: 'Traiteur Au Bon Festin', loc: 'Dijon · Traiteur événementiel',
+      type: 'escompte', typeLabel: 'Escompte',
+      desc: "Facture émise à un comité d'entreprise pour un événement déjà réalisé, en attente de règlement à 45 jours.",
+      target: 2400, raised: 1450, rate: 10, duration: 'Règlement en 1 fois',
+      scores: { financier: 4, ecologique: 3, social: 4, gouvernance: 4 }
+    },
+    {
+      id: 'p11', name: 'Plomberie Chauffage Renard', loc: 'Angers · Artisan plombier',
+      type: 'escompte', typeLabel: 'Escompte',
+      desc: "Facture de travaux validée par un syndic de copropriété, paiement attendu à 60 jours selon les délais habituels du secteur.",
+      target: 4800, raised: 2900, rate: 10, duration: 'Règlement en 1 fois',
+      scores: { financier: 4, ecologique: 3, social: 3, gouvernance: 4 }
+    },
+    {
+      id: 'p12', name: 'Atelier Graphique Lemoine', loc: 'Rennes · Studio graphique', 
+      type: 'escompte', typeLabel: 'Escompte',
+      desc: "Facture de prestation pour une PME locale, validée et non contestée, en attente de règlement à 30 jours.",
+      target: 1200, raised: 780, rate: 10, duration: 'Règlement en 1 fois',
+      scores: { financier: 4, ecologique: 4, social: 3, gouvernance: 4 }
+    },
+    {
+      id: 'p13', name: 'Transport Fret Occitan', loc: 'Béziers · Transport routier',
+      type: 'escompte', typeLabel: 'Escompte',
+      desc: "Facture de livraisons réalisées pour un client grossiste, paiement contractuel à 60 jours.",
+      target: 5400, raised: 3100, rate: 10, duration: 'Règlement en 1 fois',
+      scores: { financier: 3, ecologique: 2, social: 4, gouvernance: 4 }
+    },
+    {
+      id: 'p14', name: 'Atelier Métal Design', loc: 'Saint-Étienne · Ferronnerie d\'art',
+      type: 'escompte', typeLabel: 'Escompte',
+      desc: "Facture de fabrication sur mesure pour un architecte, réglée habituellement à 45 jours fin de mois.",
+      target: 3600, raised: 2000, rate: 10, duration: 'Règlement en 1 fois',
+      scores: { financier: 4, ecologique: 3, social: 3, gouvernance: 5 }
     }
   ];
 
@@ -135,7 +170,9 @@
   }
 
   function renderInvestStep(p, amount){
-    const yearlyYield = p.rate ? Math.round(amount * (p.rate/100) * 100) / 100 : null;
+    const isEscompte = p.type === 'escompte';
+    const gainEstimate = p.rate ? Math.round(amount * (p.rate/100) * 100) / 100 : null;
+    const yieldLabel = isEscompte ? 'Gain estimé au règlement' : (p.rate ? 'Rendement estimé / an' : 'Potentiel');
 
     modalContent.innerHTML = `
       <h2 id="modal-title">${p.name}</h2>
@@ -155,8 +192,8 @@
 
         <div class="invest-summary">
           <div class="invest-summary-row"><span>Type de financement</span><span>${p.typeLabel}</span></div>
-          <div class="invest-summary-row"><span>Durée</span><span>${p.duration}</span></div>
-          <div class="invest-summary-row"><span>${p.rate ? 'Rendement estimé / an' : 'Potentiel'}</span><span>${p.rate ? formatEUR(yearlyYield) : 'Plus-value à la sortie'}</span></div>
+          <div class="invest-summary-row"><span>${isEscompte ? 'Échéance du règlement' : 'Durée'}</span><span>${p.duration}</span></div>
+          <div class="invest-summary-row"><span>${yieldLabel}</span><span>${p.rate ? formatEUR(gainEstimate) : 'Plus-value à la sortie'}</span></div>
         </div>
 
         <button class="btn btn-primary modal-confirm-btn" id="confirm-invest">Confirmer l'investissement de <span id="confirm-amount">${amount} €</span></button>
