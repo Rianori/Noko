@@ -268,40 +268,83 @@
       <p class="modal-desc">Titre cédé par <strong>${listing.seller}</strong>, investisseur d'origine. Ce projet a déjà atteint son objectif de collecte ; il ne s'agit pas d'un nouvel investissement dans l'entreprise mais du rachat d'un titre existant.</p>
       <div class="modal-scores">${scoreBlock(listing.scores)}</div>
 
-      <div class="invest-summary buy-summary">
-        <div class="invest-summary-row"><span>Montant initialement investi</span><span>${formatEUR(listing.originalAmount)}</span></div>
-        <div class="invest-summary-row"><span>Prix demandé aujourd'hui</span><span>${formatEUR(listing.askPrice)}</span></div>
-        <div class="invest-summary-row"><span>Écart par rapport au nominal</span><span class="${diff.cls}">${diff.text}</span></div>
-        <div class="invest-summary-row"><span>Durée restante</span><span>${listing.remainingMonths} mois sur ${listing.totalMonths}</span></div>
-        <div class="invest-summary-row"><span>${listing.rate ? 'Taux indicatif restant' : 'Nature du gain'}</span><span>${listing.rate ? listing.rate + ' %' : 'Plus-value à la sortie'}</span></div>
+      <div class="invest-form">
+        <label for="buy-qty-input">Nombre de titres à acheter</label>
+        <div class="qty-row">
+          <button type="button" class="qty-btn" id="qty-minus" aria-label="Diminuer">−</button>
+          <input type="number" id="buy-qty-input" min="1" max="20" step="1" value="1">
+          <button type="button" class="qty-btn" id="qty-plus" aria-label="Augmenter">+</button>
+        </div>
+        <p class="qty-hint">Le vendeur ${listing.seller} propose plusieurs titres identiques à ce prix unitaire.</p>
+
+        <div class="invest-summary buy-summary">
+          <div class="invest-summary-row"><span>Montant initialement investi (par titre)</span><span>${formatEUR(listing.originalAmount)}</span></div>
+          <div class="invest-summary-row"><span>Prix demandé (par titre)</span><span>${formatEUR(listing.askPrice)}</span></div>
+          <div class="invest-summary-row"><span>Écart par rapport au nominal</span><span class="${diff.cls}">${diff.text}</span></div>
+          <div class="invest-summary-row"><span>Durée restante</span><span>${listing.remainingMonths} mois sur ${listing.totalMonths}</span></div>
+          <div class="invest-summary-row"><span>${listing.rate ? 'Taux indicatif restant' : 'Nature du gain'}</span><span>${listing.rate ? listing.rate + ' %' : 'Plus-value à la sortie'}</span></div>
+          <div class="invest-summary-row invest-summary-total"><span>Total à payer</span><span id="buy-total-price">${formatEUR(listing.askPrice)}</span></div>
+        </div>
+
+        <p class="buy-disclaimer">En achetant ces titres, vous reprenez les droits de l'investisseur d'origine jusqu'à l'échéance du projet. Le prix de marché peut être supérieur ou inférieur au montant initial selon l'offre et la demande.</p>
+
+        <button class="btn btn-primary modal-confirm-btn" id="confirm-buy"><span id="confirm-buy-label">Acheter 1 titre pour ${formatEUR(listing.askPrice)}</span></button>
       </div>
-
-      <p class="buy-disclaimer">En achetant ce titre, vous reprenez les droits de l'investisseur d'origine jusqu'à l'échéance du projet. Le prix de marché peut être supérieur ou inférieur au montant initial selon l'offre et la demande.</p>
-
-      <button class="btn btn-primary modal-confirm-btn" id="confirm-buy">Acheter ce titre pour ${formatEUR(listing.askPrice)}</button>
     `;
 
-    document.getElementById('confirm-buy').addEventListener('click', () => {
-      NokoStore.addHolding({
-        projectId: listing.id,
-        name: listing.projectName,
-        amount: listing.askPrice,
-        rate: listing.rate,
-        type: listing.typeLabel + ' (marché secondaire)',
-        projectType: listing.projectType,
-        duration: `${listing.remainingMonths} mois restants`
-      });
-      renderBuySuccess(listing);
+    const qtyInput = document.getElementById('buy-qty-input');
+    const qtyMinus = document.getElementById('qty-minus');
+    const qtyPlus = document.getElementById('qty-plus');
+    const totalPriceEl = document.getElementById('buy-total-price');
+    const confirmLabel = document.getElementById('confirm-buy-label');
+    const confirmBtn = document.getElementById('confirm-buy');
+
+    function clampQty(val){
+      val = parseInt(val, 10);
+      if(isNaN(val) || val < 1) val = 1;
+      if(val > 20) val = 20;
+      return val;
+    }
+
+    function syncQty(qty){
+      qty = clampQty(qty);
+      qtyInput.value = qty;
+      const total = qty * listing.askPrice;
+      totalPriceEl.textContent = formatEUR(total);
+      confirmLabel.textContent = `Acheter ${qty} ${qty > 1 ? 'titres' : 'titre'} pour ${formatEUR(total)}`;
+    }
+
+    qtyMinus.addEventListener('click', () => syncQty(parseInt(qtyInput.value, 10) - 1));
+    qtyPlus.addEventListener('click', () => syncQty(parseInt(qtyInput.value, 10) + 1));
+    qtyInput.addEventListener('input', () => syncQty(qtyInput.value));
+    qtyInput.addEventListener('blur', () => syncQty(qtyInput.value));
+
+    confirmBtn.addEventListener('click', () => {
+      const qty = clampQty(qtyInput.value);
+      for(let i = 0; i < qty; i++){
+        NokoStore.addHolding({
+          projectId: listing.id,
+          name: listing.projectName,
+          amount: listing.askPrice,
+          rate: listing.rate,
+          type: listing.typeLabel + ' (marché secondaire)',
+          projectType: listing.projectType,
+          duration: `${listing.remainingMonths} mois restants`
+        });
+      }
+      renderBuySuccess(listing, qty);
       renderHoldings();
     });
   }
 
-  function renderBuySuccess(listing){
+  function renderBuySuccess(listing, qty){
+    const total = qty * listing.askPrice;
+    const titreLabel = qty > 1 ? `${qty} titres` : 'le titre';
     buyContent.innerHTML = `
       <div class="modal-success">
         <div class="modal-success-icon">✓</div>
         <h2 id="buy-modal-title">Achat simulé</h2>
-        <p>Vous avez racheté le titre de ${listing.seller} sur ${listing.projectName} pour ${formatEUR(listing.askPrice)}. Il apparaît maintenant dans vos titres, ci-dessus.</p>
+        <p>Vous avez racheté ${titreLabel} de ${listing.seller} sur ${listing.projectName} pour ${formatEUR(total)} au total. ${qty > 1 ? 'Ils apparaissent' : 'Il apparaît'} maintenant dans vos titres, ci-dessus.</p>
         <button class="btn btn-primary" id="close-buy-success">Voir mes titres</button>
       </div>
     `;
@@ -309,7 +352,7 @@
       closeBuyModal();
       document.getElementById('mes-titres').scrollIntoView({ behavior: 'smooth' });
     });
-    showToast(`Titre acheté pour ${formatEUR(listing.askPrice)}`);
+    showToast(`${qty > 1 ? qty + ' titres achetés' : 'Titre acheté'} pour ${formatEUR(total)}`);
   }
 
   function closeBuyModal(){ buyOverlay.classList.remove('open'); }
@@ -330,4 +373,43 @@
 
   renderHoldings();
   renderMarket('tous');
+
+  // Panneau de diagnostic discret en bas de page : aide à voir l'état réel du stockage
+  // si jamais un titre attendu n'apparaît pas. Cliquer pour afficher/masquer le détail.
+  renderDiagnosticPanel();
+
+  function renderDiagnosticPanel(){
+    const panel = document.createElement('div');
+    panel.className = 'diag-panel';
+    panel.innerHTML = `
+      <button type="button" class="diag-toggle" id="diag-toggle">Diagnostic stockage</button>
+      <pre class="diag-content" id="diag-content" hidden></pre>
+    `;
+    document.body.appendChild(panel);
+
+    document.getElementById('diag-toggle').addEventListener('click', () => {
+      const content = document.getElementById('diag-content');
+      content.hidden = !content.hidden;
+      if(!content.hidden){
+        let raw = null;
+        let storageError = null;
+        try{
+          raw = localStorage.getItem('noko_demo_portfolio_v1');
+        }catch(e){
+          storageError = e.message;
+        }
+        const lines = [
+          'Origine : ' + window.location.origin,
+          'Page : ' + window.location.pathname,
+          'localStorage accessible : ' + (storageError ? 'NON (' + storageError + ')' : 'oui'),
+          'Clé "noko_demo_portfolio_v1" brute :',
+          raw || '(vide ou absente)',
+          '',
+          'NokoStore.getHoldings() :',
+          JSON.stringify(NokoStore.getHoldings(), null, 2)
+        ];
+        content.textContent = lines.join('\n');
+      }
+    });
+  }
 })();

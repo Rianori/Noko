@@ -135,7 +135,14 @@
   function renderProjects(filter){
     const list = filter === 'tous' ? PROJECTS : PROJECTS.filter(p => p.type === filter);
     grid.innerHTML = list.map(p => {
+      const isEscompte = p.type === 'escompte';
       const pct = Math.min(100, Math.round((p.raised / p.target) * 100));
+      const progressBlock = isEscompte
+        ? `<div class="escompte-amount-block"><span class="escompte-amount-label">Montant de la facture</span><span class="escompte-amount-value">${formatEUR(p.target)}</span></div>`
+        : `<div class="project-progress">
+             <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+             <div class="progress-meta"><span>${formatEUR(p.raised)} collectés</span><span>${pct}%</span></div>
+           </div>`;
       return `
         <article class="project-card" data-id="${p.id}">
           <div class="project-card-top">
@@ -146,10 +153,7 @@
             <span class="project-name">${p.name}</span>
             <span class="project-loc">${p.loc}</span>
             <p class="project-desc">${p.desc}</p>
-            <div class="project-progress">
-              <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-              <div class="progress-meta"><span>${formatEUR(p.raised)} collectés</span><span>${pct}%</span></div>
-            </div>
+            ${progressBlock}
             <div class="project-footer">
               <div>
                 <span class="project-rate">${p.rate ? p.rate + ' %' : '—'}</span>
@@ -364,4 +368,38 @@
 
   renderProjects('tous');
   renderPortfolio();
+
+  // Panneau de diagnostic discret (voir aussi sur la page Portefeuille pour comparer)
+  const panel = document.createElement('div');
+  panel.className = 'diag-panel';
+  panel.innerHTML = `
+    <button type="button" class="diag-toggle" id="diag-toggle">Diagnostic stockage</button>
+    <pre class="diag-content" id="diag-content" hidden></pre>
+  `;
+  document.body.appendChild(panel);
+
+  document.getElementById('diag-toggle').addEventListener('click', () => {
+    const content = document.getElementById('diag-content');
+    content.hidden = !content.hidden;
+    if(!content.hidden){
+      let raw = null;
+      let storageError = null;
+      try{
+        raw = localStorage.getItem('noko_demo_portfolio_v1');
+      }catch(e){
+        storageError = e.message;
+      }
+      const lines = [
+        'Origine : ' + window.location.origin,
+        'Page : ' + window.location.pathname,
+        'localStorage accessible : ' + (storageError ? 'NON (' + storageError + ')' : 'oui'),
+        'Clé "noko_demo_portfolio_v1" brute :',
+        raw || '(vide ou absente)',
+        '',
+        'NokoStore.getHoldings() :',
+        JSON.stringify(NokoStore.getHoldings(), null, 2)
+      ];
+      content.textContent = lines.join('\n');
+    }
+  });
 })();

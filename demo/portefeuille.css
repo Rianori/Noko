@@ -128,3 +128,29 @@
 .buy-summary .diff-decote{ color: #b5651d !important; font-weight: 700; }
 .buy-summary .diff-pair{ color: var(--green-mid) !important; }
 .buy-disclaimer{ font-size: 12.5px; color: var(--green-mid); margin: 16px 0 24px; }
+
+/* Sélecteur de quantité (achat multiple marché secondaire) */
+.qty-row{
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 10px; width: fit-content;
+}
+.qty-btn{
+  width: 38px; height: 38px;
+  border: 1.5px solid rgba(11,43,31,0.2);
+  background: var(--cream-dim); color: var(--forest);
+  font-size: 18px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.qty-btn:first-child{ border-radius: 4px 0 0 4px; border-right: none; }
+.qty-btn:last-child{ border-radius: 0 4px 4px 0; border-left: none; }
+.qty-btn:hover{ background: rgba(63,174,73,0.12); }
+#buy-qty-input{
+  width: 64px; height: 38px; text-align: center;
+  font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--forest);
+  border: 1.5px solid rgba(11,43,31,0.2); border-left: none; border-right: none;
+  background: var(--cream);
+}
+#buy-qty-input:focus{ outline: none; }
+.qty-hint{ font-size: 12.5px; color: var(--green-mid); margin: 0 0 20px; }
+.invest-summary-total{ border-top: 1px solid rgba(246,244,236,0.2); padding-top: 10px; margin-top: 6px; font-weight: 700; }
+.invest-summary-total span:last-child{ color: var(--green-acid) !important; font-size: 16px; }
