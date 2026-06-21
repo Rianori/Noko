@@ -292,7 +292,13 @@
     const list = filter === 'tous' ? window.NOKO_MARKET_LISTINGS : window.NOKO_MARKET_LISTINGS.filter(l => l.projectType === filter);
 
     marketGrid.innerHTML = list.map(listing => {
+      const isCapital = listing.projectType === 'capital';
       const progressPct = Math.round((listing.remainingMonths / listing.totalMonths) * 100);
+      const remainingBlock = isCapital ? '' : `
+            <div class="market-remaining">
+              <div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+              <span class="progress-meta-single">${listing.remainingMonths} mois restants sur ${listing.totalMonths}</span>
+            </div>`;
       return `
         <article class="market-card" data-id="${listing.id}">
           <div class="market-card-top">
@@ -301,11 +307,7 @@
           <div class="market-card-body">
             <span class="project-name">${listing.projectName}</span>
             <span class="project-loc">${listing.loc}</span>
-            <p class="market-seller">Investissement initial ${formatEUR(listing.originalAmount)}</p>
-            <div class="market-remaining">
-              <div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%"></div></div>
-              <span class="progress-meta-single">${listing.remainingMonths} mois restants sur ${listing.totalMonths}</span>
-            </div>
+            <p class="market-seller">Investissement initial ${formatEUR(listing.originalAmount)}</p>${remainingBlock}
             <div class="project-footer market-footer">
               <div>
                 <span class="project-rate">${formatEUR(listing.askPrice)}</span>
@@ -399,7 +401,7 @@
         rate: listing.rate,
         type: listing.typeLabel + ' (marché secondaire)',
         projectType: listing.projectType,
-        duration: `${listing.remainingMonths} mois restants`
+        duration: isCapital ? '' : `${listing.remainingMonths} mois restants`
       }, qty);
 
       renderBuySuccess(listing, qty);
