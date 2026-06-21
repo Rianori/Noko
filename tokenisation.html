@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comprendre la tokenisation — NoKo</title>
+<meta name="description" content="Schéma interactif expliquant comment NoKo transforme une créance en token échangeable sur un marché secondaire.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="tokenisation.css">
+</head>
+<body>
+
+<div class="grain"></div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="./" class="logo">NoKo</a>
+    <nav class="nav-links">
+      <a href="./#modele">Le modèle</a>
+      <a href="demo/">Démo</a>
+    </nav>
+    <a href="./" class="btn btn-ghost nav-cta">← Retour au site</a>
+  </div>
+</header>
+
+<main>
+  <section class="token-hero">
+    <p class="eyebrow">La tokenisation, expliquée simplement</p>
+    <h1>Une créance devient un jeton.<br>Le jeton devient échangeable.</h1>
+    <p class="hero-sub-light">Cliquez sur chaque étape pour comprendre comment NoKo transforme votre investissement en un titre que vous pouvez revendre à tout moment — sans jargon technique.</p>
+  </section>
+
+  <section class="token-diagram-section">
+    <div class="token-diagram-wrap">
+      <svg id="token-svg" viewBox="0 0 980 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schéma du cycle de tokenisation NoKo">
+        <!-- Chemin de connexion entre les étapes -->
+        <path d="M 150 230 L 360 230" class="flow-line" data-line="1"/>
+        <path d="M 590 230 L 800 230" class="flow-line" data-line="2"/>
+        <path d="M 800 270 C 800 380, 500 420, 150 420 C 80 420, 80 320, 150 270" class="flow-line flow-line-return" data-line="3"/>
+
+        <!-- Flèches -->
+        <polygon points="360,230 348,224 348,236" class="flow-arrow" data-arrow="1"/>
+        <polygon points="800,230 788,224 788,236" class="flow-arrow" data-arrow="2"/>
+        <polygon points="150,270 152,258 162,266" class="flow-arrow" data-arrow="3"/>
+
+        <!-- Étape 1 : Investissement -->
+        <g class="token-node" data-step="1" tabindex="0" role="button" aria-label="Étape 1 : Investissement">
+          <circle cx="150" cy="230" r="80" class="node-circle"/>
+          <text x="150" y="215" class="node-num">01</text>
+          <text x="150" y="245" class="node-label">Investissement</text>
+        </g>
+
+        <!-- Étape 2 : Création du token -->
+        <g class="token-node" data-step="2" tabindex="0" role="button" aria-label="Étape 2 : Création du token">
+          <circle cx="475" cy="230" r="80" class="node-circle"/>
+          <text x="475" y="207" class="node-num">02</text>
+          <text x="475" y="237" class="node-label">Création</text>
+          <text x="475" y="257" class="node-label">du token</text>
+        </g>
+
+        <!-- Étape 3 : Détention -->
+        <g class="token-node" data-step="3" tabindex="0" role="button" aria-label="Étape 3 : Détention">
+          <circle cx="800" cy="230" r="80" class="node-circle"/>
+          <text x="800" y="215" class="node-num">03</text>
+          <text x="800" y="245" class="node-label">Détention</text>
+        </g>
+
+        <!-- Étape 4 : Revente sur le marché secondaire -->
+        <g class="token-node" data-step="4" tabindex="0" role="button" aria-label="Étape 4 : Revente sur le marché secondaire">
+          <circle cx="475" cy="420" r="80" class="node-circle"/>
+          <text x="475" y="397" class="node-num">04</text>
+          <text x="475" y="427" class="node-label">Revente sur le</text>
+          <text x="475" y="447" class="node-label">marché secondaire</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="token-detail" id="token-detail">
+      <span class="token-detail-eyebrow">Cliquez sur une étape</span>
+      <h2 id="token-detail-title">Découvrez le cycle complet</h2>
+      <p id="token-detail-text">Le schéma ci-dessus suit le parcours d'un seul euro investi sur NoKo, de votre virement initial jusqu'à la revente éventuelle de votre titre à un autre investisseur. Cliquez sur l'étape 01 pour commencer.</p>
+      <div class="token-detail-meta" id="token-detail-meta" hidden></div>
+    </div>
+  </section>
+
+  <section class="token-summary">
+    <p class="eyebrow">En une phrase</p>
+    <h2>Le token, c'est votre reçu — mais un reçu qu'on peut revendre.</h2>
+    <p class="section-intro">Sur le crowdfunding classique, votre investissement reste bloqué jusqu'à l'échéance du projet : aucun moyen de récupérer votre argent avant. La tokenisation change cela : votre créance existe sous une forme numérique que vous pouvez céder à un autre investisseur, à tout moment, au prix que vous fixez.</p>
+
+    <div class="token-compare">
+      <div class="token-compare-col token-compare-them">
+        <h3>Crowdfunding classique</h3>
+        <ul>
+          <li>Contrat papier ou numérique simple</li>
+          <li>Aucune cessibilité avant échéance</li>
+          <li>Argent immobilisé pendant toute la durée</li>
+        </ul>
+      </div>
+      <div class="token-compare-col token-compare-us">
+        <h3>NoKo, avec tokenisation</h3>
+        <ul>
+          <li>Créance représentée par un token numérique</li>
+          <li>Cessible à tout moment sur le marché secondaire</li>
+          <li>Liquidité partielle même avant l'échéance</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-final">
+    <h2>Voir la tokenisation à l'œuvre</h2>
+    <div class="hero-actions">
+      <a href="demo/" class="btn btn-primary">Tester le marché secondaire</a>
+      <a href="./" class="btn btn-ghost">Retour à l'accueil</a>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <span>NoKo — Schéma pédagogique, données simplifiées</span>
+  <span><a href="./">Retour à la landing page</a></span>
+</footer>
+
+<script src="tokenisation.js"></script>
+</body>
+</html>
