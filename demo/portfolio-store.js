@@ -5,17 +5,32 @@
 window.NokoStore = (function(){
   const KEY = 'noko_demo_portfolio_v1';
   const MARKET_KEY = 'noko_demo_market_v1';
+  const instanceId = 'inst_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  console.log('NokoStore: nouvelle instance créée ->', instanceId);
 
-  // Fallback mémoire si localStorage est inaccessible (navigation privée stricte, etc.)
+  // Fallback mémoire si localStorage est inaccessible (navigation privée stricte, Safari avec
+  // cookies/stockage bloqués, etc.). Le test vérifie une RELECTURE de la valeur écrite, pas
+  // seulement l'absence d'exception : certains navigateurs (Safari notamment) peuvent accepter
+  // un setItem() sans lever d'erreur tout en ne persistant rien réellement.
   let memoryFallback = [];
   let storageAvailable = true;
   try{
     const testKey = '__noko_test__';
-    localStorage.setItem(testKey, '1');
+    const testValue = 'probe_' + Date.now();
+    localStorage.setItem(testKey, testValue);
+    const readBack = localStorage.getItem(testKey);
     localStorage.removeItem(testKey);
+    if(readBack !== testValue){
+      storageAvailable = false;
+      console.warn('NokoStore: localStorage accepte l\'écriture mais ne persiste pas la valeur (écrit "' + testValue + '", relu "' + readBack + '"). Bascule en mémoire pour cette session.');
+    }
   }catch(e){
     storageAvailable = false;
     console.warn('NokoStore: localStorage indisponible, le portefeuille ne persistera pas entre les pages dans cette session.', e);
+  }
+
+  if(!storageAvailable && typeof window.NokoShowStorageWarning === 'function'){
+    window.NokoShowStorageWarning('stockage persistant', 'mémoire temporaire uniquement (le portefeuille se réinitialisera au rechargement)');
   }
 
   function load(){
@@ -64,7 +79,7 @@ window.NokoStore = (function(){
       save(items);
 
       const verify = load();
-      console.log(`NokoStore.addHolding: ${countBefore} titre(s) avant, ${verify.length} après ajout de "${holding.name}".`);
+      console.log(`NokoStore[${instanceId}].addHolding: ${countBefore} titre(s) avant, ${verify.length} après ajout de "${holding.name}". memoryFallback.length=${memoryFallback.length}, storageAvailable=${storageAvailable}`);
       if(verify.length !== countBefore + 1){
         console.error(`NokoStore: écart de persistance détecté sur addHolding. Attendu ${countBefore + 1}, trouvé ${verify.length}.`);
         if(typeof window.NokoShowStorageWarning === 'function'){
