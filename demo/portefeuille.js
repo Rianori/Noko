@@ -14,6 +14,14 @@
     return Math.round(n).toLocaleString('fr-FR') + ' €';
   }
 
+  // Alerte visible si le store détecte un écart entre ce qui devait être écrit et ce qui a été relu.
+  window.NokoShowStorageWarning = function(expected, actual){
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:500;background:#b5651d;color:#fff;padding:14px 20px;text-align:center;font-family:monospace;font-size:13px;';
+    banner.textContent = `Problème de stockage détecté : ${expected} titres attendus, ${actual} réellement enregistrés. Votre navigateur limite peut-être le stockage local sur ce site (mode privé strict, extension de blocage, ou stockage désactivé dans les réglages).`;
+    document.body.prepend(banner);
+  };
+
   function scoreBlock(scores){
     const labels = { financier: 'Financier', ecologique: 'Écologique', social: 'Social', gouvernance: 'Gouvernance' };
     return Object.keys(labels).map(k => `

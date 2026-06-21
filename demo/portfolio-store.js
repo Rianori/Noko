@@ -67,6 +67,7 @@ window.NokoStore = (function(){
     /** Ajoute plusieurs titres identiques en une seule opération atomique (achat groupé sur le marché secondaire) */
     addMultipleHoldings(holdingTemplate, qty){
       const items = load();
+      const countBefore = items.length;
       for(let i = 0; i < qty; i++){
         items.push(Object.assign({
           id: genId() + '_' + i,
@@ -76,7 +77,17 @@ window.NokoStore = (function(){
         }, holdingTemplate));
       }
       save(items);
-      return items;
+
+      // Vérification post-écriture : relit immédiatement pour confirmer que tout a bien été persisté.
+      const verify = load();
+      const expectedCount = countBefore + qty;
+      if(verify.length !== expectedCount){
+        console.error(`NokoStore: écart de persistance détecté. Attendu ${expectedCount} titres, trouvé ${verify.length} après écriture.`);
+        if(typeof window.NokoShowStorageWarning === 'function'){
+          window.NokoShowStorageWarning(expectedCount, verify.length);
+        }
+      }
+      return verify;
     },
 
     /** Met un titre en vente à un prix fixé par l'utilisateur */
