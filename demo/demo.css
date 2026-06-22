@@ -151,7 +151,26 @@
   font-family: var(--font-mono); font-weight: 700; font-size: 22px; color: var(--forest);
   min-width: 80px; text-align: right;
 }
-.invest-presets{ display: flex; gap: 8px; margin: 14px 0 24px; }
+.invest-presets{ display: flex; gap: 8px; margin: 14px 0 16px; }
+
+.invest-custom-row{ margin-bottom: 24px; }
+.invest-custom-label{
+  display: block; font-family: var(--font-mono); font-size: 12px;
+  color: var(--green-mid); margin-bottom: 8px;
+}
+.invest-custom-input-wrap{
+  display: flex; align-items: center; gap: 8px;
+  max-width: 160px;
+}
+.invest-custom-input-wrap input[type="number"]{
+  flex: 1; font-family: var(--font-mono); font-size: 15px; font-weight: 600;
+  border: 1.5px solid rgba(11,43,31,0.2); border-radius: 4px;
+  padding: 9px 12px; color: var(--forest);
+  background: var(--cream-dim);
+}
+.invest-custom-input-wrap input[type="number"]:focus{ outline: none; border-color: var(--green-vivid); }
+.invest-custom-input-wrap input[type="number"]::placeholder{ color: rgba(11,43,31,0.35); }
+.invest-custom-suffix{ font-family: var(--font-mono); font-size: 14px; color: var(--green-mid); }
 .preset-btn{
   font-family: var(--font-mono); font-size: 13px;
   padding: 6px 14px; border-radius: 100px;

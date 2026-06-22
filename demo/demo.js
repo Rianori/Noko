@@ -220,6 +220,13 @@
         <div class="invest-presets">
           ${[10,30,50,100].map(v => `<button class="preset-btn${v===amount?' active':''}" data-val="${v}">${v} €</button>`).join('')}
         </div>
+        <div class="invest-custom-row">
+          <label for="invest-custom-input" class="invest-custom-label">Ou montant libre</label>
+          <div class="invest-custom-input-wrap">
+            <input type="number" id="invest-custom-input" min="10" max="500" step="1" placeholder="${amount}">
+            <span class="invest-custom-suffix">€</span>
+          </div>
+        </div>
 
         <div class="invest-summary">
           <div class="invest-summary-row"><span>Type de financement</span><span>${p.typeLabel}</span></div>
@@ -235,23 +242,38 @@
     const display = document.getElementById('invest-amount-display');
     const confirmAmount = document.getElementById('confirm-amount');
     const presets = modalContent.querySelectorAll('.preset-btn');
+    const customInput = document.getElementById('invest-custom-input');
 
-    function syncAmount(val){
+    function syncAmount(val, skipCustomClear){
+      val = Math.max(10, Math.min(500, val));
       display.textContent = val + ' €';
       confirmAmount.textContent = val + ' €';
+      slider.value = val;
       presets.forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.val) === val));
       const yieldVal = p.rate ? Math.round(val * (p.rate/100) * 100) / 100 : null;
       const yieldRow = modalContent.querySelector('.invest-summary-row:last-child span:last-child');
       if(p.rate) yieldRow.textContent = formatEUR(yieldVal);
+      if(!skipCustomClear) customInput.value = '';
     }
 
     slider.addEventListener('input', (e) => syncAmount(parseInt(e.target.value)));
     presets.forEach(btn => {
       btn.addEventListener('click', () => {
         const v = parseInt(btn.dataset.val);
-        slider.value = v;
         syncAmount(v);
       });
+    });
+    customInput.addEventListener('input', () => {
+      const v = parseInt(customInput.value, 10);
+      if(!isNaN(v) && v > 0){
+        syncAmount(v, true);
+      }
+    });
+    customInput.addEventListener('blur', () => {
+      const v = parseInt(customInput.value, 10);
+      if(!isNaN(v) && v > 0){
+        customInput.value = Math.max(10, Math.min(500, v));
+      }
     });
 
     document.getElementById('confirm-invest').addEventListener('click', () => {
@@ -280,6 +302,13 @@
         <div class="invest-presets">
           ${[10,30,50,100].map(v => `<button class="preset-btn${v===amount?' active':''}" data-val="${v}">${v} €</button>`).join('')}
         </div>
+        <div class="invest-custom-row">
+          <label for="invest-custom-input" class="invest-custom-label">Ou montant libre</label>
+          <div class="invest-custom-input-wrap">
+            <input type="number" id="invest-custom-input" min="10" max="500" step="1" placeholder="${amount}">
+            <span class="invest-custom-suffix">€</span>
+          </div>
+        </div>
 
         <div class="invest-summary">
           <div class="invest-summary-row"><span>Type de financement</span><span>${p.typeLabel}</span></div>
@@ -295,20 +324,35 @@
     const display = document.getElementById('invest-amount-display');
     const confirmAmount = document.getElementById('confirm-amount');
     const presets = modalContent.querySelectorAll('.preset-btn');
+    const customInput = document.getElementById('invest-custom-input');
 
-    function syncAmount(val){
+    function syncAmount(val, skipCustomClear){
+      val = Math.max(10, Math.min(500, val));
       display.textContent = val + ' €';
       confirmAmount.textContent = val + ' €';
+      slider.value = val;
       presets.forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.val) === val));
+      if(!skipCustomClear) customInput.value = '';
     }
 
     slider.addEventListener('input', (e) => syncAmount(parseInt(e.target.value)));
     presets.forEach(btn => {
       btn.addEventListener('click', () => {
         const v = parseInt(btn.dataset.val);
-        slider.value = v;
         syncAmount(v);
       });
+    });
+    customInput.addEventListener('input', () => {
+      const v = parseInt(customInput.value, 10);
+      if(!isNaN(v) && v > 0){
+        syncAmount(v, true);
+      }
+    });
+    customInput.addEventListener('blur', () => {
+      const v = parseInt(customInput.value, 10);
+      if(!isNaN(v) && v > 0){
+        customInput.value = Math.max(10, Math.min(500, v));
+      }
     });
 
     document.getElementById('confirm-invest').addEventListener('click', () => {
