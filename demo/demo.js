@@ -223,7 +223,7 @@
         <div class="invest-custom-row">
           <label for="invest-custom-input" class="invest-custom-label">Ou montant libre</label>
           <div class="invest-custom-input-wrap">
-            <input type="number" id="invest-custom-input" min="10" max="500" step="1" placeholder="${amount}">
+            <input type="number" id="invest-custom-input" min="10" step="1" placeholder="${amount}">
             <span class="invest-custom-suffix">€</span>
           </div>
         </div>
@@ -244,44 +244,64 @@
     const presets = modalContent.querySelectorAll('.preset-btn');
     const customInput = document.getElementById('invest-custom-input');
 
-    function syncAmount(val, skipCustomClear){
-      val = Math.max(10, Math.min(500, val));
-      display.textContent = val + ' €';
-      confirmAmount.textContent = val + ' €';
-      slider.value = val;
-      presets.forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.val) === val));
+    function updateYield(val){
       const yieldVal = p.rate ? Math.round(val * (p.rate/100) * 100) / 100 : null;
       const yieldRow = modalContent.querySelector('.invest-summary-row:last-child span:last-child');
       if(p.rate) yieldRow.textContent = formatEUR(yieldVal);
-      if(!skipCustomClear) customInput.value = '';
     }
 
-    slider.addEventListener('input', (e) => syncAmount(parseInt(e.target.value)));
+    // Depuis le slider ou les presets : valeur toujours bornée 10-500 (limite du curseur)
+    function syncFromSlider(val){
+      val = Math.max(10, Math.min(500, val));
+      slider.value = val;
+      display.textContent = val + ' €';
+      confirmAmount.textContent = val + ' €';
+      presets.forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.val) === val));
+      updateYield(val);
+      customInput.value = '';
+    }
+
+    // Depuis le champ libre : aucun plafond, seul un minimum de 10€ est imposé
+    function syncFromCustom(val){
+      val = Math.max(10, val);
+      display.textContent = val + ' €';
+      confirmAmount.textContent = val + ' €';
+      slider.value = Math.min(500, val); // le curseur visuel reste dans sa plage, sans limiter la saisie
+      presets.forEach(btn => btn.classList.remove('active'));
+      updateYield(val);
+    }
+
+    let currentAmount = amount;
+
+    slider.addEventListener('input', (e) => {
+      currentAmount = parseInt(e.target.value);
+      syncFromSlider(currentAmount);
+    });
     presets.forEach(btn => {
       btn.addEventListener('click', () => {
-        const v = parseInt(btn.dataset.val);
-        syncAmount(v);
+        currentAmount = parseInt(btn.dataset.val);
+        syncFromSlider(currentAmount);
       });
     });
     customInput.addEventListener('input', () => {
       const v = parseInt(customInput.value, 10);
       if(!isNaN(v) && v > 0){
-        syncAmount(v, true);
+        currentAmount = v;
+        syncFromCustom(v);
       }
     });
     customInput.addEventListener('blur', () => {
       const v = parseInt(customInput.value, 10);
       if(!isNaN(v) && v > 0){
-        customInput.value = Math.max(10, Math.min(500, v));
+        customInput.value = Math.max(10, v);
       }
     });
 
     document.getElementById('confirm-invest').addEventListener('click', () => {
-      const finalAmount = parseInt(slider.value);
       window.NokoStore.addHolding({
-        projectId: p.id, name: p.name, amount: finalAmount, rate: p.rate, type: p.typeLabel, projectType: p.type, duration: p.duration
+        projectId: p.id, name: p.name, amount: currentAmount, rate: p.rate, type: p.typeLabel, projectType: p.type, duration: p.duration
       });
-      renderSuccessStep(p, finalAmount);
+      renderSuccessStep(p, currentAmount);
       if(typeof window.NokoRenderHoldings === 'function') window.NokoRenderHoldings();
     });
   }
@@ -305,7 +325,7 @@
         <div class="invest-custom-row">
           <label for="invest-custom-input" class="invest-custom-label">Ou montant libre</label>
           <div class="invest-custom-input-wrap">
-            <input type="number" id="invest-custom-input" min="10" max="500" step="1" placeholder="${amount}">
+            <input type="number" id="invest-custom-input" min="10" step="1" placeholder="${amount}">
             <span class="invest-custom-suffix">€</span>
           </div>
         </div>
@@ -326,41 +346,54 @@
     const presets = modalContent.querySelectorAll('.preset-btn');
     const customInput = document.getElementById('invest-custom-input');
 
-    function syncAmount(val, skipCustomClear){
+    function syncFromSlider(val){
       val = Math.max(10, Math.min(500, val));
+      slider.value = val;
       display.textContent = val + ' €';
       confirmAmount.textContent = val + ' €';
-      slider.value = val;
       presets.forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.val) === val));
-      if(!skipCustomClear) customInput.value = '';
+      customInput.value = '';
     }
 
-    slider.addEventListener('input', (e) => syncAmount(parseInt(e.target.value)));
+    function syncFromCustom(val){
+      val = Math.max(10, val);
+      display.textContent = val + ' €';
+      confirmAmount.textContent = val + ' €';
+      slider.value = Math.min(500, val);
+      presets.forEach(btn => btn.classList.remove('active'));
+    }
+
+    let currentAmount = amount;
+
+    slider.addEventListener('input', (e) => {
+      currentAmount = parseInt(e.target.value);
+      syncFromSlider(currentAmount);
+    });
     presets.forEach(btn => {
       btn.addEventListener('click', () => {
-        const v = parseInt(btn.dataset.val);
-        syncAmount(v);
+        currentAmount = parseInt(btn.dataset.val);
+        syncFromSlider(currentAmount);
       });
     });
     customInput.addEventListener('input', () => {
       const v = parseInt(customInput.value, 10);
       if(!isNaN(v) && v > 0){
-        syncAmount(v, true);
+        currentAmount = v;
+        syncFromCustom(v);
       }
     });
     customInput.addEventListener('blur', () => {
       const v = parseInt(customInput.value, 10);
       if(!isNaN(v) && v > 0){
-        customInput.value = Math.max(10, Math.min(500, v));
+        customInput.value = Math.max(10, v);
       }
     });
 
     document.getElementById('confirm-invest').addEventListener('click', () => {
-      const finalAmount = parseInt(slider.value);
       window.NokoStore.addHolding({
-        projectId: p.id, name: p.name, amount: finalAmount, rate: null, type: p.typeLabel, projectType: p.type, duration: p.duration
+        projectId: p.id, name: p.name, amount: currentAmount, rate: null, type: p.typeLabel, projectType: p.type, duration: p.duration
       });
-      renderSuccessStep(p, finalAmount);
+      renderSuccessStep(p, currentAmount);
       if(typeof window.NokoRenderHoldings === 'function') window.NokoRenderHoldings();
     });
   }
