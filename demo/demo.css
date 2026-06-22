@@ -211,7 +211,7 @@
 .portfolio-empty-sub{ font-size: 13.5px; color: rgba(246,244,236,0.4); }
 
 .portfolio-summary{
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
   margin-top: 56px; margin-bottom: 32px;
 }
 .summary-card{
@@ -223,6 +223,9 @@
 .summary-label{ font-size: 13px; color: rgba(246,244,236,0.65); }
 .summary-value{ font-family: var(--font-mono); font-weight: 700; font-size: 26px; color: var(--green-acid); }
 
+@media (max-width: 900px){
+  .portfolio-summary{ grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 760px){
   .portfolio-summary{ grid-template-columns: 1fr; }
 }

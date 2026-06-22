@@ -94,9 +94,12 @@
 
     const total = holdings.reduce((sum, h) => sum + h.amount, 0);
     const onSale = holdings.filter(h => h.status === 'en_vente').length;
+    const projetsSoutenus = new Set(holdings.map(h => h.projectId)).size;
+    const nombreDeTitres = Math.round(total / 10);
 
     document.getElementById('holdings-total').textContent = formatEUR(total);
-    document.getElementById('holdings-count').textContent = holdings.length;
+    document.getElementById('holdings-count').textContent = projetsSoutenus;
+    document.getElementById('holdings-titres').textContent = nombreDeTitres;
     document.getElementById('holdings-on-sale').textContent = onSale;
 
     const { groups, onSaleItems } = groupHoldings(holdings);
