@@ -108,6 +108,13 @@
       desc: "Facture de fabrication sur mesure pour un architecte, réglée habituellement à 45 jours fin de mois.",
       target: 3600, raised: 2000, rate: 10, duration: 'Règlement en 1 fois',
       scores: { financier: 4, ecologique: 3, social: 3, gouvernance: 5 }
+    },
+    {
+      id: 'p15', name: 'Prêt étudiant', loc: 'Bientôt le Nord · Master en Expertise d\'ingénierie patrimoniale',
+      type: 'don', typeLabel: 'Don',
+      desc: "Un étudiant, qui a eu besoin d'un prêt étudiant pour la réussite de ses études, doit maintenant le rembourser. Mais il a été contraint de partir dans... le NORD ! Ne plus avoir cette dette serait un vrai plus pour lui.",
+      target: 20000, raised: 12000, rate: null, duration: 'Don sans contrepartie',
+      scores: { financier: 5, ecologique: 5, social: 5, gouvernance: 5 }
     }
   ];
 
@@ -157,7 +164,7 @@
             <div class="project-footer">
               <div>
                 <span class="project-rate">${p.rate ? p.rate + ' %' : '—'}</span>
-                <span class="project-rate-label">${p.rate ? 'taux indicatif' : 'gain en capital'}</span>
+                <span class="project-rate-label">${p.rate ? 'taux indicatif' : (p.type === 'don' ? 'sans contrepartie' : 'gain en capital')}</span>
               </div>
               <span class="project-rate-label">${p.duration}</span>
             </div>
@@ -184,9 +191,14 @@
 
   function renderInvestStep(p, amount){
     const isEscompte = p.type === 'escompte';
+    const isDon = p.type === 'don';
 
     if(isEscompte){
       renderEscompteStep(p);
+      return;
+    }
+    if(isDon){
+      renderDonStep(p, amount);
       return;
     }
 
@@ -246,6 +258,63 @@
       const finalAmount = parseInt(slider.value);
       window.NokoStore.addHolding({
         projectId: p.id, name: p.name, amount: finalAmount, rate: p.rate, type: p.typeLabel, projectType: p.type, duration: p.duration
+      });
+      renderSuccessStep(p, finalAmount);
+      if(typeof window.NokoRenderHoldings === 'function') window.NokoRenderHoldings();
+    });
+  }
+
+  function renderDonStep(p, amount){
+    modalContent.innerHTML = `
+      <h2 id="modal-title">${p.name}</h2>
+      <p class="modal-loc">${p.loc}</p>
+      <p class="modal-desc">${p.desc}</p>
+      <div class="modal-scores">${scoreBlock(p.scores)}</div>
+
+      <div class="invest-form">
+        <label for="invest-slider">Montant du don</label>
+        <div class="invest-amount-row">
+          <input type="range" id="invest-slider" min="10" max="500" step="10" value="${amount}">
+          <span class="invest-amount-display" id="invest-amount-display">${amount} €</span>
+        </div>
+        <div class="invest-presets">
+          ${[10,30,50,100].map(v => `<button class="preset-btn${v===amount?' active':''}" data-val="${v}">${v} €</button>`).join('')}
+        </div>
+
+        <div class="invest-summary">
+          <div class="invest-summary-row"><span>Type de financement</span><span>${p.typeLabel}</span></div>
+          <div class="invest-summary-row"><span>Contrepartie</span><span>Aucune</span></div>
+        </div>
+        <p class="escompte-note">Un don NoKo ne donne droit à aucun remboursement ni intérêt : c'est une contribution directe et définitive au projet, sans contrepartie financière.</p>
+
+        <button class="btn btn-primary modal-confirm-btn" id="confirm-invest">Faire un don de <span id="confirm-amount">${amount} €</span></button>
+      </div>
+    `;
+
+    const slider = document.getElementById('invest-slider');
+    const display = document.getElementById('invest-amount-display');
+    const confirmAmount = document.getElementById('confirm-amount');
+    const presets = modalContent.querySelectorAll('.preset-btn');
+
+    function syncAmount(val){
+      display.textContent = val + ' €';
+      confirmAmount.textContent = val + ' €';
+      presets.forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.val) === val));
+    }
+
+    slider.addEventListener('input', (e) => syncAmount(parseInt(e.target.value)));
+    presets.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const v = parseInt(btn.dataset.val);
+        slider.value = v;
+        syncAmount(v);
+      });
+    });
+
+    document.getElementById('confirm-invest').addEventListener('click', () => {
+      const finalAmount = parseInt(slider.value);
+      window.NokoStore.addHolding({
+        projectId: p.id, name: p.name, amount: finalAmount, rate: null, type: p.typeLabel, projectType: p.type, duration: p.duration
       });
       renderSuccessStep(p, finalAmount);
       if(typeof window.NokoRenderHoldings === 'function') window.NokoRenderHoldings();
