@@ -391,11 +391,12 @@ input[type="range"]::-moz-range-thumb{
 }
 .testimonial-video-frame{
   position: relative;
-  width: 100%; max-width: 320px;
+  width: 100%; max-width: 480px;
   aspect-ratio: 9 / 16;
-  border-radius: 12px;
+  max-height: 75vh;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 12px 32px rgba(11,43,31,0.18);
+  box-shadow: 0 16px 48px rgba(11,43,31,0.22);
   border: 1px solid rgba(11,43,31,0.1);
 }
 .testimonial-video-frame iframe{
